@@ -26,6 +26,7 @@ const MOUSE_SHAPE_SVG = `
 <path d="M109.532 10L112.494 13.1562L204.774 111.466L211.198 118.31L204.774 125.153L112.494 223.474L109.532 226.63H23.1025L38.9121 209.786L124.768 118.31L38.9121 26.8438L23.1016 10H109.532Z" fill="currentColor" stroke="currentColor" stroke-width="10"/>
 </svg>
 `;
+
 const CONFIG = {
   // === FOR TESTING / DEBUGGiNG ===
 
@@ -254,7 +255,7 @@ const TRANSITION = {
 
   ROTATION_REDUCTION: 1.0 // reduces mouse influence during TO
 };
-
+    
 // === FOR MAIN SCRIPT IN WEBFLOW ===
 
 const vertexShader = `
