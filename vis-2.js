@@ -1339,6 +1339,15 @@
           svgTexture = await loadImageTexture(CONFIG.SVG_IMAGE_URL);
 
           buildParticles();
+
+           window.AIM_VIS2_READY = true;
+
+          window.dispatchEvent(
+            new CustomEvent('aimVisualReady', {
+              detail: { id: 'vis-2' },
+            })
+          );
+          
         },
 
         enter(app, progress = {}) {
