@@ -1992,18 +1992,23 @@ try {
 }
     },
 
-    enter() {
-      isActive = true;
-      addListeners();
+  enter() {
+  isActive = true;
+  addListeners();
 
-      if (!points && texturesLoaded) {
-        buildParticles(textures[currentImageIndex]);
-      }
+  if (!points && texturesLoaded) {
+    buildParticles(textures[currentImageIndex]);
+  }
 
-      if (points) {
-        points.visible = true;
-      }
-    },
+  if (points) {
+    points.visible = true;
+
+    if (CONFIG.OPEN_WITH_TRANSITION_IN && state === "display") {
+      startInitialDisplayState();
+      restartPulse();
+    }
+  }
+},
 
     update(app, progress) {
       const exitProgress = progress.exitProgress || 0;
