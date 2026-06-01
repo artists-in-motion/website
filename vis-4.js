@@ -1363,7 +1363,7 @@
         scene.add(ambientLight);
         scene.add(light1, light2);
 
-       try {
+  try {
   await loadTextures();
 
   buildCubelets();
@@ -1379,6 +1379,8 @@
       detail: { id: 'vis-4' },
     })
   );
+} catch (error) {
+  console.error('Vis 4 globe texture load failed:', error);
 }
       },
 
