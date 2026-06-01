@@ -1020,7 +1020,8 @@
       async function buildGrid() {
         if (isBuilding || isBuilt) return;
 
-        disposeGrid();
+        isBuilding = true; 
+       disposeGrid();
 
         outerGroup = new THREE.Group();
         backFloatGroup = new THREE.Group();
