@@ -1525,49 +1525,49 @@ console.log('VIS 5 CLEAN VERSION 03');
       applyTimeline();
     }
 
-    return {
-      async init() {
-        sectionEl = document.getElementById("vis-5");
+return {
+  async init() {
+    sectionEl = document.getElementById("vis-5");
 
-        masterGroup.visible = false;
-        masterGroup.scale.setScalar(CONFIG.VISUAL_SCALE);
+    masterGroup.visible = false;
+    masterGroup.scale.setScalar(CONFIG.VISUAL_SCALE);
 
-        pivotGroup.position.set(
-          CONFIG.CUBE_POSITION_X,
-          CONFIG.CUBE_POSITION_Y,
-          CONFIG.CUBE_POSITION_Z,
-        );
+    pivotGroup.position.set(
+      CONFIG.CUBE_POSITION_X,
+      CONFIG.CUBE_POSITION_Y,
+      CONFIG.CUBE_POSITION_Z,
+    );
 
-        masterGroup.add(pivotGroup);
+    masterGroup.add(pivotGroup);
 
-        pivotGroup.add(rubikRotationGroup);
-        rubikRotationGroup.add(tileGroup);
+    pivotGroup.add(rubikRotationGroup);
+    rubikRotationGroup.add(tileGroup);
 
-        pivotGroup.add(floatGroup);
+    pivotGroup.add(floatGroup);
 
-        scene.add(masterGroup);
-        scene.add(ambientLight);
-        scene.add(light1, light2);
+    scene.add(masterGroup);
+    scene.add(ambientLight);
+    scene.add(light1, light2);
 
-        await loadTextures();
-        await loadSvgMask();
+    await loadTextures();
+    await loadSvgMask();
 
-        buildTiles();
-        buildFloatingCubes();
+    buildTiles();
+    buildFloatingCubes();
 
-        isBuilt = true;
-        applyCurrentStateAfterLoad();
+    isBuilt = true;
+    applyCurrentStateAfterLoad();
 
-        window.AIM_VIS5_READY = true;
+    window.AIM_VIS5_READY = true;
 
-        window.dispatchEvent(
-          new CustomEvent("aimVisualReady", {
-            detail: { id: "vis-5" },
-          }),
-        );
-      },
+    window.dispatchEvent(
+      new CustomEvent("aimVisualReady", {
+        detail: { id: "vis-5" },
+      }),
+    );
+  },
 
-      enter(app, progress = {}) {
+  enter(app, progress = {}) {
         isActive = true;
 
         if (isBuilt) {
