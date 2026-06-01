@@ -1262,18 +1262,24 @@
           scene.add(ambientLight);
           scene.add(light1, light2);
 
-          try {
-            await loadTextures();
-            await loadSvgMask();
+        try {
+  await loadTextures();
+  await loadSvgMask();
 
-            buildTiles();
-            buildFloatingCubes();
+  buildTiles();
+  buildFloatingCubes();
 
-            isBuilt = true;
-            applyCurrentStateAfterLoad();
-          } catch (error) {
-            console.error('Vis 5 tile grid texture load failed:', error);
-          }
+  isBuilt = true;
+  applyCurrentStateAfterLoad();
+
+  window.AIM_VIS5_READY = true;
+
+  window.dispatchEvent(
+    new CustomEvent('aimVisualReady', {
+      detail: { id: 'vis-5' },
+    })
+  );
+}
         },
 
         enter(app, progress = {}) {
