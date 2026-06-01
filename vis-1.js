@@ -1994,7 +1994,7 @@ try {
 }
     },
 
-enter() {
+enter(app, progress = {}) {
   isActive = true;
   addListeners();
 
@@ -2002,7 +2002,15 @@ enter() {
     buildParticles(textures[currentImageIndex]);
   }
 
-  startInitialIntroOnce();
+  if (points) {
+    points.visible = true;
+  }
+
+  if (!initialIntroStarted) {
+    startInitialIntroOnce();
+  } else {
+    update(app, progress);
+  }
 },
 
 update(app, progress) {
