@@ -2016,16 +2016,6 @@ enter() {
   startInitialIntroOnce();
 },
 
-  if (points) {
-    points.visible = true;
-
-    if (CONFIG.OPEN_WITH_TRANSITION_IN && state === "display") {
-      startInitialDisplayState();
-      restartPulse();
-    }
-  }
-},
-
     update(app, progress) {
       const exitProgress = progress.exitProgress || 0;
 
