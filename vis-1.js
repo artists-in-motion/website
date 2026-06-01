@@ -1,4 +1,3 @@
-console.log('VIS 1 FILE LOADED FROM GITHUB');
 (function startWhenAIMReady() {
     if (!window.AIM) {
       window.addEventListener('aimGlobalReady', startWhenAIMReady, {
@@ -2017,6 +2016,5 @@ points.position.y =
   };
 })();
 
-console.log('REGISTERING VIS 1');
 window.AIM.register("vis-1", Vis1);
 })();
