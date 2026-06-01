@@ -1008,7 +1008,8 @@ const Vis1 = (() => {
     if (!points) return;
 
     points.position.y =
-      CONFIG.BASE_POS_Y + scrollOutroProgress * TRANSITION.TO_TARGET_Y_OFFSET;
+  CONFIG.BASE_POS_Y +
+  scrollOutroProgress * (TRANSITION.TO_TARGET_POS_Y - CONFIG.BASE_POS_Y);
 
     scene.remove(points);
 
