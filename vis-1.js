@@ -1,3 +1,4 @@
+console.log('VIS 1 VERSION: INIT DEBUG 02');
 (function startWhenAIMReady() {
     if (!window.AIM) {
       window.addEventListener('aimGlobalReady', startWhenAIMReady, {
