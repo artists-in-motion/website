@@ -1258,7 +1258,7 @@
 
           pivotGroup.add(floatGroup);
 
-          scene.add(masterGroup);
+        scene.add(masterGroup);
 scene.add(ambientLight);
 scene.add(light1, light2);
 
@@ -1278,7 +1278,6 @@ window.dispatchEvent(
     detail: { id: 'vis-5' },
   })
 );
-        },
 
         enter(app, progress = {}) {
           isActive = true;
