@@ -224,7 +224,7 @@ const TRANSITION = {
   TO_TARGET_ROT_Z: 0.0, // target Z rotation
 
   TO_TARGET_POS_X: 0.0, // target X position during TO
-  TO_TARGET_POS_Y: -10.0, // target Y position during TO, negative = down
+  TO_TARGET_POS_Y: -0.1, // target Y position during TO, negative = down
   TO_TARGET_POS_Z: 0.5, // target Z position during TO
 
   // === TO COLOUR / ALPHA MATCH ===
