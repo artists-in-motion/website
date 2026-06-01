@@ -1137,8 +1137,7 @@
           scene.add(masterGroup);
           scene.add(ambientLight);
           scene.add(light1, light2);
-
-          try {
+try {
   await loadTextures();
 
   initMoves();
@@ -1156,7 +1155,6 @@
       detail: { id: 'vis-3' },
     })
   );
-
 }
         },
 
