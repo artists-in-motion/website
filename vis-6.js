@@ -1096,8 +1096,9 @@ window.dispatchEvent(
     detail: { id: 'vis-6' },
   })
 );
+}
 
-      function updateTransitionProgress(progress = {}) {
+function updateTransitionProgress(progress = {}) {
         sectionEl = sectionEl || document.getElementById('vis-6');
 
         if (!sectionEl) return;
