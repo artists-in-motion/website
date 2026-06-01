@@ -2016,7 +2016,7 @@ enter() {
   startInitialIntroOnce();
 },
 
-    update(app, progress) {
+update(app, progress) {
       const exitProgress = progress.exitProgress || 0;
 
       scrollOutroProgress = clamp01(exitProgress);
