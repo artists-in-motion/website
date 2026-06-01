@@ -1942,6 +1942,7 @@ points.position.y =
       statsEl = document.getElementById("stats");
 
       try {
+        IMAGE_URLS = await waitForImageUrls('.urls', 1, 5000);
         textures = await Promise.all(IMAGE_URLS.map(loadTexture));
         texturesLoaded = true;
 
