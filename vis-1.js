@@ -583,26 +583,32 @@ color.rgb = clamp(color.rgb, 0.0, 1.0);
   }
   `;
 
-  function waitForImageUrls(selector = '.urls', minCount = 1, timeoutMs = 5000) {
+function waitForImageUrls(selector = '.urls', minCount = 1, timeoutMs = 5000) {
   return new Promise((resolve) => {
     const start = performance.now();
 
-    function check() {
-      const urls = window.AIM.getImageUrls(selector);
+    function getCmsUrls() {
+      return [...document.querySelectorAll(selector)]
+        .map((el) => el.textContent.trim())
+        .filter((url) => url.startsWith('http'));
+    }
 
-      console.log('[VIS-1] checking image urls', {
-        count: urls.length,
-        urls,
+    function check() {
+      const cmsUrls = getCmsUrls();
+
+      console.log('[VIS-1] checking CMS urls', {
+        cmsCount: cmsUrls.length,
+        cmsUrls,
       });
 
-      if (urls.length >= minCount) {
-        resolve(urls);
+      if (cmsUrls.length >= minCount) {
+        resolve(window.AIM.getImageUrls(selector));
         return;
       }
 
       if (performance.now() - start >= timeoutMs) {
-        console.warn('[VIS-1] image url wait timed out, using fallback/getImageUrls result', urls);
-        resolve(urls);
+        console.warn('[VIS-1] CMS url wait timed out, using fallback images');
+        resolve(window.AIM.getImageUrls(selector));
         return;
       }
 
@@ -1961,6 +1967,11 @@ try {
   nextImageIndex = getNextImageIndex();
 
   buildParticles(textures[currentImageIndex]);
+
+    console.log('[VIS-1] READY', {
+  imageUrls: IMAGE_URLS,
+  textureCount: textures.length,
+});
 
   window.AIM_VIS1_READY = true;
 
