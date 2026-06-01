@@ -821,9 +821,17 @@ const Vis1 = (() => {
   }
 
   function restartPulse() {
-    pulseStartMs = getNowMs() + CONFIG.MS_PULSE_DELAY_MS;
-    pulseProgress = 0;
-  }
+  pulseStartMs = getNowMs() + CONFIG.MS_PULSE_DELAY_MS;
+  pulseProgress = 0;
+
+  window.dispatchEvent(
+    new CustomEvent('aimVis1PulseStart', {
+      detail: {
+        scrollY: window.scrollY || 0,
+      },
+    })
+  );
+}
 
   function updatePulse(nowMs) {
     if (!CONFIG.MS_PULSE_ENABLED || pulseStartMs < 0) {
