@@ -1020,7 +1020,16 @@
       async function buildGrid() {
         if (isBuilding || isBuilt) return;
 
-        isBuilding = true;
+        isBuilt = true;
+isBuilding = false;
+
+window.AIM_VIS6_READY = true;
+
+window.dispatchEvent(
+  new CustomEvent('aimVisualReady', {
+    detail: { id: 'vis-6' },
+  })
+);
 
         disposeGrid();
 
@@ -1255,21 +1264,14 @@
 
       window.addEventListener('pointermove', onPointerMove);
 
-      async init() {
-  sectionEl = document.getElementById('vis-6');
+return {
+  init() {
+    sectionEl = document.getElementById('vis-6');
 
-  await buildGrid();
+    buildGrid();
+  },
 
-  window.AIM_VIS6_READY = true;
-
-  window.dispatchEvent(
-    new CustomEvent('aimVisualReady', {
-      detail: { id: 'vis-6' },
-    })
-  );
-},
-
-        enter(app, progress = {}) {
+  enter(app, progress = {}) {
           isActive = true;
 
           if (!isBuilt) {
