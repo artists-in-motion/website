@@ -1,5 +1,12 @@
-const app = window.AIM;
-if (!app) throw new Error("Missing window.AIM. Add the global engine first.");
+  (function startWhenAIMReady() {
+    if (!window.AIM) {
+      window.addEventListener('aimGlobalReady', startWhenAIMReady, {
+        once: true,
+      });
+      return;
+    }
+
+    const app = window.AIM;
 
 const THREE = app.THREE;
 const container = app.container;
@@ -2003,3 +2010,4 @@ points.position.y =
 })();
 
 window.AIM.register("vis-1", Vis1);
+})();
