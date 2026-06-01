@@ -2011,8 +2011,6 @@ enter(app, progress = {}) {
   } else {
     resetToDisplayPhase();
   }
-
-  update(app, progress);
 },
 
 update(app, progress) {
