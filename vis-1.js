@@ -682,6 +682,7 @@ const Vis1 = (() => {
   let isActive = false;
   let listenersAttached = false;
   let texturesLoaded = false;
+    let initialIntroStarted = false;
 
   let scrollOutroProgress = 0;
   let scrollMainProgress = 0;
@@ -1608,6 +1609,22 @@ const Vis1 = (() => {
     }
   }
 
+    function startInitialIntroOnce() {
+  if (initialIntroStarted) return;
+  if (!texturesLoaded || !points || !material) return;
+
+  initialIntroStarted = true;
+
+  points.visible = true;
+
+  setState("transitionIn");
+  setPhaseUniforms(2.0, 0.0, CONFIG.TRANSITION_IN_DURATION_MS);
+
+  restartPulse();
+
+  console.log('[VIS-1] initial intro started');
+}
+
   function updatePointerState(nowMs) {
     updateIntroInfluence(nowMs);
 
@@ -1982,23 +1999,22 @@ try {
     })
   );
 
-  if (isActive && points) {
-    points.visible = true;
-    startInitialDisplayState();
-    restartPulse();
-  }
+
 } catch (error) {
   console.error("Vis 1 setup failed:", error);
 }
     },
 
-  enter() {
+enter() {
   isActive = true;
   addListeners();
 
   if (!points && texturesLoaded) {
     buildParticles(textures[currentImageIndex]);
   }
+
+  startInitialIntroOnce();
+},
 
   if (points) {
     points.visible = true;
