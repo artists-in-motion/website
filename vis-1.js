@@ -1,4 +1,4 @@
-console.log('VIS 1 VERSION: INIT DEBUG 02');
+
 (function startWhenAIMReady() {
     if (!window.AIM) {
       window.addEventListener('aimGlobalReady', startWhenAIMReady, {
@@ -597,18 +597,12 @@ function waitForImageUrls(selector = '.urls', minCount = 1, timeoutMs = 5000) {
     function check() {
       const cmsUrls = getCmsUrls();
 
-      console.log('[VIS-1] checking CMS urls', {
-        cmsCount: cmsUrls.length,
-        cmsUrls,
-      });
-
       if (cmsUrls.length >= minCount) {
         resolve(window.AIM.getImageUrls(selector));
         return;
       }
 
       if (performance.now() - start >= timeoutMs) {
-        console.warn('[VIS-1] CMS url wait timed out, using fallback images');
         resolve(window.AIM.getImageUrls(selector));
         return;
       }
@@ -1622,7 +1616,6 @@ const Vis1 = (() => {
 
   restartPulse();
 
-  console.log('[VIS-1] initial intro started');
 }
 
   function updatePointerState(nowMs) {
@@ -1985,11 +1978,6 @@ try {
   nextImageIndex = getNextImageIndex();
 
   buildParticles(textures[currentImageIndex]);
-
-    console.log('[VIS-1] READY', {
-  imageUrls: IMAGE_URLS,
-  textureCount: textures.length,
-});
 
   window.AIM_VIS1_READY = true;
 
