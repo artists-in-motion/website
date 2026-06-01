@@ -1278,6 +1278,7 @@ window.dispatchEvent(
     detail: { id: 'vis-5' },
   })
 );
+        },
 
         enter(app, progress = {}) {
           isActive = true;
