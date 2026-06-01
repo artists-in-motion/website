@@ -18,7 +18,7 @@ const clock = app.clock;
 // Uses global AIM image helper
 // Second value = max number of images / No second value to return all images
 // Example window.AIM.getImageUrls('.urls', 6); / will fetch 6 images
-const IMAGE_URLS = window.AIM.getImageUrls(".urls");
+let IMAGE_URLS = [];
 
 const MOUSE_SHAPE_SVG = `
 <svg width="100%" style="" viewBox="0 0 225 237" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -582,6 +582,36 @@ color.rgb = clamp(color.rgb, 0.0, 1.0);
   gl_FragColor = color;
   }
   `;
+
+  function waitForImageUrls(selector = '.urls', minCount = 1, timeoutMs = 5000) {
+  return new Promise((resolve) => {
+    const start = performance.now();
+
+    function check() {
+      const urls = window.AIM.getImageUrls(selector);
+
+      console.log('[VIS-1] checking image urls', {
+        count: urls.length,
+        urls,
+      });
+
+      if (urls.length >= minCount) {
+        resolve(urls);
+        return;
+      }
+
+      if (performance.now() - start >= timeoutMs) {
+        console.warn('[VIS-1] image url wait timed out, using fallback/getImageUrls result', urls);
+        resolve(urls);
+        return;
+      }
+
+      requestAnimationFrame(check);
+    }
+
+    check();
+  });
+}
 
 const Vis1 = (() => {
   const loader = new THREE.TextureLoader();
