@@ -1278,9 +1278,9 @@ window.dispatchEvent(
     detail: { id: 'vis-5' },
   })
 );
-        },
+},
 
-        enter(app, progress = {}) {
+enter(app, progress = {}) {
           isActive = true;
 
           if (isBuilt) {
