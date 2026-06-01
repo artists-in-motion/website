@@ -1261,7 +1261,6 @@
           scene.add(masterGroup);
           scene.add(ambientLight);
           scene.add(light1, light2);
-
         try {
   await loadTextures();
   await loadSvgMask();
