@@ -1255,12 +1255,19 @@
 
       window.addEventListener('pointermove', onPointerMove);
 
-      return {
-        init() {
-          sectionEl = document.getElementById('vis-6');
+      async init() {
+  sectionEl = document.getElementById('vis-6');
 
-          buildGrid();
-        },
+  await buildGrid();
+
+  window.AIM_VIS6_READY = true;
+
+  window.dispatchEvent(
+    new CustomEvent('aimVisualReady', {
+      detail: { id: 'vis-6' },
+    })
+  );
+},
 
         enter(app, progress = {}) {
           isActive = true;
