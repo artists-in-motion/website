@@ -2009,8 +2009,10 @@ enter(app, progress = {}) {
   if (!initialIntroStarted) {
     startInitialIntroOnce();
   } else {
-    update(app, progress);
+    resetToDisplayPhase();
   }
+
+  update(app, progress);
 },
 
 update(app, progress) {
