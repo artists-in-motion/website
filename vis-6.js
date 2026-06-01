@@ -1020,17 +1020,6 @@
       async function buildGrid() {
         if (isBuilding || isBuilt) return;
 
-        isBuilt = true;
-isBuilding = false;
-
-window.AIM_VIS6_READY = true;
-
-window.dispatchEvent(
-  new CustomEvent('aimVisualReady', {
-    detail: { id: 'vis-6' },
-  })
-);
-
         disposeGrid();
 
         outerGroup = new THREE.Group();
@@ -1097,9 +1086,16 @@ window.dispatchEvent(
           renderOrder: 2,
         });
 
-        isBuilt = true;
-        isBuilding = false;
-      }
+       isBuilt = true;
+isBuilding = false;
+
+window.AIM_VIS6_READY = true;
+
+window.dispatchEvent(
+  new CustomEvent('aimVisualReady', {
+    detail: { id: 'vis-6' },
+  })
+);
 
       function updateTransitionProgress(progress = {}) {
         sectionEl = sectionEl || document.getElementById('vis-6');
