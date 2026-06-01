@@ -1940,36 +1940,44 @@ points.position.y =
       initPointerStateBeforeFirstRender();
       loadMouseMask();
       statsEl = document.getElementById("stats");
+try {
+  IMAGE_URLS = await waitForImageUrls('.urls', 1, 5000);
 
-      try {
-        IMAGE_URLS = await waitForImageUrls('.urls', 1, 5000);
-        textures = await Promise.all(IMAGE_URLS.map(loadTexture));
-        texturesLoaded = true;
+  const results = await Promise.allSettled(IMAGE_URLS.map(loadTexture));
 
-        shuffleImageIndexes();
+  textures = results
+    .filter((result) => result.status === 'fulfilled')
+    .map((result) => result.value);
 
-        currentImageIndex = getNextImageIndex();
+  if (!textures.length) {
+    throw new Error('No Vis 1 textures loaded');
+  }
 
-        nextImageIndex = getNextImageIndex();
+  texturesLoaded = true;
 
-        buildParticles(textures[currentImageIndex]);
+  shuffleImageIndexes();
 
-        window.AIM_VIS1_READY = true;
-          
-        window.dispatchEvent(
-          new CustomEvent('aimVisualReady', {
-            detail: { id: 'vis-1' },
-          })
-        );
+  currentImageIndex = getNextImageIndex();
+  nextImageIndex = getNextImageIndex();
 
-        if (isActive && points) {
-          points.visible = true;
-          startInitialDisplayState();
-          restartPulse();
-        }
-      } catch (error) {
-        console.error("Vis 1 setup failed:", error);
-      }
+  buildParticles(textures[currentImageIndex]);
+
+  window.AIM_VIS1_READY = true;
+
+  window.dispatchEvent(
+    new CustomEvent('aimVisualReady', {
+      detail: { id: 'vis-1' },
+    })
+  );
+
+  if (isActive && points) {
+    points.visible = true;
+    startInitialDisplayState();
+    restartPulse();
+  }
+} catch (error) {
+  console.error("Vis 1 setup failed:", error);
+}
     },
 
     enter() {
