@@ -1363,17 +1363,23 @@ console.log('VIS 4 LOADED FROM GITHUB');
         scene.add(ambientLight);
         scene.add(light1, light2);
 
-        try {
-          await loadTextures();
+       try {
+  await loadTextures();
 
-          buildCubelets();
-          buildFloatingCubes();
+  buildCubelets();
+  buildFloatingCubes();
 
-          isBuilt = true;
-          applyCurrentStateAfterLoad();
-        } catch (error) {
-          console.error('Vis 4 globe texture load failed:', error);
-        }
+  isBuilt = true;
+  applyCurrentStateAfterLoad();
+
+  window.AIM_VIS4_READY = true;
+
+  window.dispatchEvent(
+    new CustomEvent('aimVisualReady', {
+      detail: { id: 'vis-4' },
+    })
+  );
+}
       },
 
       enter(app, progress = {}) {
