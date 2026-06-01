@@ -1259,26 +1259,25 @@
           pivotGroup.add(floatGroup);
 
           scene.add(masterGroup);
-          scene.add(ambientLight);
-          scene.add(light1, light2);
-        try {
-  await loadTextures();
-  await loadSvgMask();
+scene.add(ambientLight);
+scene.add(light1, light2);
 
-  buildTiles();
-  buildFloatingCubes();
+await loadTextures();
+await loadSvgMask();
 
-  isBuilt = true;
-  applyCurrentStateAfterLoad();
+buildTiles();
+buildFloatingCubes();
 
-  window.AIM_VIS5_READY = true;
+isBuilt = true;
+applyCurrentStateAfterLoad();
 
-  window.dispatchEvent(
-    new CustomEvent('aimVisualReady', {
-      detail: { id: 'vis-5' },
-    })
-  );
-}
+window.AIM_VIS5_READY = true;
+
+window.dispatchEvent(
+  new CustomEvent('aimVisualReady', {
+    detail: { id: 'vis-5' },
+  })
+);
         },
 
         enter(app, progress = {}) {
