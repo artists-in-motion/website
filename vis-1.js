@@ -1924,6 +1924,13 @@ points.position.y =
 
         buildParticles(textures[currentImageIndex]);
 
+        window.AIM_VIS1_READY = true;
+        window.dispatchEvent(
+          new CustomEvent('aimVisualReady', {
+            detail: { id: 'vis-1' },
+          })
+        );
+
         if (isActive && points) {
           points.visible = true;
           startInitialDisplayState();
