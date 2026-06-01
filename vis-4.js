@@ -1,4 +1,4 @@
-console.log('VIS 4 LOADED FROM GITHUB');
+
 (function startWhenAIMReady() {
     if (!window.AIM) {
       window.addEventListener('aimGlobalReady', startWhenAIMReady, {
