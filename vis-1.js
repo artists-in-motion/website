@@ -1,4 +1,3 @@
-console.log('VIS 1 CACHE TEST 001');
 (function startWhenAIMReady() {
     if (!window.AIM) {
       window.addEventListener('aimGlobalReady', startWhenAIMReady, {
