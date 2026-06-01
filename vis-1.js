@@ -2006,36 +2006,9 @@ enter(app, progress = {}) {
     points.visible = true;
   }
 
-  const nearTop = (window.scrollY || 0) < 250;
-
-  if (nearTop) {
-    scrollOutroProgress = 0;
-    scrollMainProgress = 0;
-    msStarfieldProgress = 0;
-    imageCyclePaused = false;
-
-    if (material) {
-      material.uniforms.uScrollAlpha.value = 1.0;
-      material.uniforms.uToAlphaMix.value = 1.0;
-      material.uniforms.uToWhiteMix.value = 0.0;
-      material.uniforms.uToEdgeFadeProgress.value = 0.0;
-      material.uniforms.uMsStarfieldShapeMix.value = 0.0;
-      material.uniforms.uMsStarfieldVisualMix.value = 0.0;
-    }
-
-    if (points) {
-      points.position.x = CONFIG.BASE_POS_X;
-      points.position.y = CONFIG.BASE_POS_Y;
-      points.rotation.x = CONFIG.BASE_ROT_X;
-      points.rotation.y = CONFIG.BASE_ROT_Y;
-      points.rotation.z = CONFIG.BASE_ROT_Z;
-    }
-  }
-
   if (!initialIntroStarted) {
     startInitialIntroOnce();
   } else {
-    resetToDisplayPhase();
     update(app, progress);
   }
 },
