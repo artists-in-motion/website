@@ -1157,8 +1157,6 @@
     })
   );
 
-} catch (error) {
-  console.error('Vis 3 texture load failed:', error);
 }
         },
 
