@@ -1139,18 +1139,27 @@
           scene.add(light1, light2);
 
           try {
-            await loadTextures();
+  await loadTextures();
 
-            initMoves();
-            buildCubelets();
-            buildFloatingCubes();
-            captureScrambledState();
+  initMoves();
+  buildCubelets();
+  buildFloatingCubes();
+  captureScrambledState();
 
-            isBuilt = true;
-            applyCurrentStateAfterLoad();
-          } catch (error) {
-            console.error('Vis 3 texture load failed:', error);
-          }
+  isBuilt = true;
+  applyCurrentStateAfterLoad();
+
+  window.AIM_VIS3_READY = true;
+
+  window.dispatchEvent(
+    new CustomEvent('aimVisualReady', {
+      detail: { id: 'vis-3' },
+    })
+  );
+
+} catch (error) {
+  console.error('Vis 3 texture load failed:', error);
+}
         },
 
         enter(app, progress = {}) {
