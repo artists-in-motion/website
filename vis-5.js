@@ -1,4 +1,3 @@
-console.log('VIS 5 CLEAN VERSION 03');
 (function startWhenAIMReady() {
   if (!window.AIM) {
     window.addEventListener("aimGlobalReady", startWhenAIMReady, {
