@@ -1139,7 +1139,6 @@ function updateTransitionProgress(progress = {}) {
         const toExtraScroll = toProgress * imageStepY * CONFIG.TO_SCROLL_SPEED_MULTIPLIER * toSpeedT;
 
         columnOffsetY = baseColumnOffsetY + toExtraScroll;
-        columnOffsetY = baseColumnOffsetY + imageStepY * CONFIG.TO_SCROLL_SPEED_MULTIPLIER * toSpeedT;
       }
 
       function updateRotation() {
