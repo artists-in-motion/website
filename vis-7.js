@@ -971,12 +971,19 @@
           });
   
           return {
-            init() {
-              sectionEl = document.getElementById('vis-7');
-  
-              build();
-            },
-  
+            async init() {
+                  sectionEl = document.getElementById('vis-7');
+                
+                  await build();
+                
+                  window.AIM_VIS7_READY = true;
+                
+                  window.dispatchEvent(
+                    new CustomEvent('aimVisualReady', {
+                      detail: { id: 'vis-7' },
+                    })
+                  );
+                },
             enter(app, progress = {}) {
               isActive = true;
   
