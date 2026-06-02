@@ -651,30 +651,7 @@
             beamGeometry.attributes.position.needsUpdate = true;
             beamGeometry.attributes.aBeamAlpha.needsUpdate = true;
           }
-  
-          function startPulseLoop() {
-            if (pulseRAF) return;
-  
-            function loop() {
-              if (!isActive) {
-                pulseRAF = null;
-                return;
-              }
-  
-              applyReveal();
-  
-              pulseRAF = requestAnimationFrame(loop);
-            }
-  
-            pulseRAF = requestAnimationFrame(loop);
-          }
-  
-          function stopPulseLoop() {
-            if (pulseRAF) {
-              cancelAnimationFrame(pulseRAF);
-              pulseRAF = null;
-            }
-          }
+
   
           async function createShapePositions(shapeName, count) {
             if (shapeName === 'cube') return createFallbackShapeData(createCubePositions(count));
