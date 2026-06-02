@@ -976,8 +976,7 @@
   
                   applyTITransform();
                   applyReveal();
-  
-                  startPulseLoop();
+
                 });
   
                 return;
@@ -989,8 +988,7 @@
   
               applyTITransform();
               applyReveal();
-  
-              startPulseLoop();
+
             },
   
             update(app, progress = {}) {
