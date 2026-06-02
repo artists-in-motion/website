@@ -1,4 +1,3 @@
-console.log("LOG: Added intro changes");
 (function startWhenAIMReady() {
     if (!window.AIM) {
       window.addEventListener('aimGlobalReady', startWhenAIMReady, {
