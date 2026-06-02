@@ -493,7 +493,6 @@
           }
   
           function dispose() {
-            stopPulseLoop();
   
             if (coreParticles) {
               rootGroup.remove(coreParticles);
@@ -1009,8 +1008,6 @@
   
             exit() {
               isActive = false;
-  
-              stopPulseLoop();
   
               if (rootGroup) rootGroup.visible = false;
               if (coreParticles) coreParticles.visible = false;
