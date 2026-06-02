@@ -155,7 +155,7 @@
     // TI - MOUSE CONTROL
     // =========================================================
 
-    TI_MOUSE_START: 30, // Mouse influence begins.
+    TI_MOUSE_START: 50, // Mouse influence begins.
     TI_MOUSE_END: 100, // Mouse reaches full strength.
 
     // =========================================================
