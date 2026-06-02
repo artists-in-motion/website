@@ -171,7 +171,6 @@
           let pulseFlags = null;
           let pulseSpeeds = null;
           let pulsePhases = null;
-          let pulseRAF = null;
   
           let isActive = false;
           let isBuilt = false;
