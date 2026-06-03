@@ -924,19 +924,19 @@ const Vis1 = (() => {
             breakpoint: "desktop"
           };
 
-    let sampleWidth = CONFIG.SAMPLE_WIDTH_DESKTOP;
+    let sampleWidth = CONFIG.SAMPLE_WIDTH_DESKTOP || 600;
 
-    if (viewport.breakpoint === "tablet") {
-      sampleWidth = CONFIG.SAMPLE_WIDTH_TABLET;
-    }
+   if (viewport.breakpoint === "tablet") {
+  sampleWidth = CONFIG.SAMPLE_WIDTH_TABLET || sampleWidth;
+}
 
-    if (viewport.breakpoint === "mobileLandscape") {
-      sampleWidth = CONFIG.SAMPLE_WIDTH_MOBILE_LANDSCAPE;
-    }
+if (viewport.breakpoint === "mobileLandscape") {
+  sampleWidth = CONFIG.SAMPLE_WIDTH_MOBILE_LANDSCAPE || sampleWidth;
+}
 
-    if (viewport.breakpoint === "mobilePortrait") {
-      sampleWidth = CONFIG.SAMPLE_WIDTH_MOBILE_PORTRAIT;
-    }
+if (viewport.breakpoint === "mobilePortrait") {
+  sampleWidth = CONFIG.SAMPLE_WIDTH_MOBILE_PORTRAIT || sampleWidth;
+}
 
     const sampleHeight = Math.max(2, Math.round(sampleWidth / viewport.aspect));
 
@@ -957,25 +957,30 @@ const Vis1 = (() => {
     };
   }
 
-  function getPlaneSize(imageWidth, imageHeight) {
-    const imageAspect = imageWidth / imageHeight;
-    const { width: viewWidth, height: viewHeight } = getContainerSize();
-    const viewAspect = viewWidth / viewHeight;
+ function getPlaneSize(imageWidth, imageHeight) {
+  const imageAspect = imageWidth / imageHeight;
+  const { width: viewWidth, height: viewHeight } = getContainerSize();
+  const viewAspect = viewWidth / viewHeight;
 
-    if (imageAspect > viewAspect) {
-      const width = 6;
-      return {
-        width: height * imageAspect * CONFIG.PLANE_OVERSCAN_X,
-        height: height * CONFIG.PLANE_OVERSCAN_Y
-      };
-    }
+  const overscanX = CONFIG.PLANE_OVERSCAN_X || 1.0;
+  const overscanY = CONFIG.PLANE_OVERSCAN_Y || 1.0;
 
-    const height = 4;
+  if (imageAspect > viewAspect) {
+    const width = 6;
+
     return {
-      width: height * imageAspect * CONFIG.PLANE_OVERSCAN_X,
-      height: height * CONFIG.PLANE_OVERSCAN_Y
+      width: width * overscanX,
+      height: (width / imageAspect) * overscanY
     };
   }
+
+  const height = 4;
+
+  return {
+    width: height * imageAspect * overscanX,
+    height: height * overscanY
+  };
+}
 
   function getNormalizedPointer(clientX, clientY) {
     const rect = container.getBoundingClientRect();
