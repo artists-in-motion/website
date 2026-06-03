@@ -606,6 +606,12 @@
 
       let rowCount = 1;
 
+   function showLogoEnabled() {
+  if (!sectionEl) return true;
+
+  return !sectionEl.hasAttribute('hide-logo');
+}
+
       function clamp01(v) {
         return Math.min(Math.max(v, 0), 1);
       }
@@ -1168,7 +1174,13 @@
         riverOffsetZ = TRANSITION.TI_FROM_Z * (1 - moveT);
         waveBoost = TRANSITION.TI_WAVE_BOOST * (1 - moveT);
 
-        svgReveal = getRangeProgress(tiProgress, CONFIG.SVG_REVEAL_START, CONFIG.SVG_REVEAL_END);
+        svgReveal = showLogoEnabled()
+  ? getRangeProgress(
+      tiProgress,
+      CONFIG.SVG_REVEAL_START,
+      CONFIG.SVG_REVEAL_END
+    )
+  : 0;
 
         svgLiftProgress = 0;
       }
@@ -1180,9 +1192,18 @@
         riverOffsetZ = 0;
         waveBoost = 0;
 
-        svgReveal = 1;
+       if (showLogoEnabled()) {
+  svgReveal = 1;
 
-        svgLiftProgress = getRangeProgress(msProgress, CONFIG.SVG_LIFT_START, CONFIG.SVG_LIFT_END);
+  svgLiftProgress = getRangeProgress(
+    msProgress,
+    CONFIG.SVG_LIFT_START,
+    CONFIG.SVG_LIFT_END
+  );
+} else {
+  svgReveal = 0;
+  svgLiftProgress = 1;
+}
       }
 
       function applyTransitionOut() {
@@ -1311,7 +1332,12 @@
           liftMaterial.uniforms.uSvgImageAlpha.value = CONFIG.SVG_IMAGE_ALPHA;
           liftMaterial.uniforms.uSvgImageToWhite.value = CONFIG.SVG_IMAGE_TO_WHITE;
 
-          liftPoints.visible = isActive && scrollAlpha > 0.001 && svgReveal > 0.001 && svgLiftProgress < 0.999;
+        liftPoints.visible =
+  showLogoEnabled() &&
+  isActive &&
+  scrollAlpha > 0.001 &&
+  svgReveal > 0.001 &&
+  svgLiftProgress < 0.999;
           liftPoints.position.y = toProgress * TRANSITION.TO_OBJECT_MOVE_Y;
           liftPoints.position.z = toProgress * TRANSITION.TO_OBJECT_MOVE_Z;
           liftPoints.rotation.x = CONFIG.BASE_ROT_X + toProgress * TRANSITION.TO_OBJECT_ROTATE_X;
