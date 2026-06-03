@@ -360,14 +360,19 @@ color.rgb = clamp(color.rgb, 0.0, 1.0);
   }
   `;
 
-function waitForImageUrls(selector = '.urls', minCount = 1, timeoutMs = 5000) {
+function debugLog(...args) {
+  if (!CONFIG.DEBUG_CONSOLE) return;
+  console.log(...args);
+}
+
+function waitForImageUrls(selector = ".urls", minCount = 1, timeoutMs = 5000) {
   return new Promise((resolve) => {
     const start = performance.now();
 
     function getCmsUrls() {
       return [...document.querySelectorAll(selector)]
         .map((el) => el.textContent.trim())
-        .filter((url) => url.startsWith('http'));
+        .filter((url) => url.startsWith("http"));
     }
 
     function check() {
@@ -452,7 +457,7 @@ const Vis1 = (() => {
   let isActive = false;
   let listenersAttached = false;
   let texturesLoaded = false;
-    let initialIntroStarted = false;
+  let initialIntroStarted = false;
 
   let scrollOutroProgress = 0;
   let scrollMainProgress = 0;
@@ -821,17 +826,17 @@ const Vis1 = (() => {
   }
 
   function restartPulse() {
-  pulseStartMs = getNowMs() + CONFIG.MS_PULSE_DELAY_MS;
-  pulseProgress = 0;
+    pulseStartMs = getNowMs() + CONFIG.MS_PULSE_DELAY_MS;
+    pulseProgress = 0;
 
-  window.dispatchEvent(
-    new CustomEvent('aimVis1PulseStart', {
-      detail: {
-        scrollY: window.scrollY || 0,
-      },
-    })
-  );
-}
+    window.dispatchEvent(
+      new CustomEvent("aimVis1PulseStart", {
+        detail: {
+          scrollY: window.scrollY || 0
+        }
+      })
+    );
+  }
 
   function updatePulse(nowMs) {
     if (!CONFIG.MS_PULSE_ENABLED || pulseStartMs < 0) {
@@ -907,6 +912,50 @@ const Vis1 = (() => {
     };
   }
 
+  function getResponsiveSampleSize() {
+    const viewport =
+      typeof app.getViewportProfile === "function"
+        ? app.getViewportProfile()
+        : {
+            width: window.innerWidth || 1,
+            height: window.innerHeight || 1,
+            aspect: (window.innerWidth || 1) / (window.innerHeight || 1),
+            breakpoint: "desktop"
+          };
+
+    let sampleWidth = CONFIG.SAMPLE_WIDTH_DESKTOP;
+
+    if (viewport.breakpoint === "tablet") {
+      sampleWidth = CONFIG.SAMPLE_WIDTH_TABLET;
+    }
+
+    if (viewport.breakpoint === "mobileLandscape") {
+      sampleWidth = CONFIG.SAMPLE_WIDTH_MOBILE_LANDSCAPE;
+    }
+
+    if (viewport.breakpoint === "mobilePortrait") {
+      sampleWidth = CONFIG.SAMPLE_WIDTH_MOBILE_PORTRAIT;
+    }
+
+    const sampleHeight = Math.max(2, Math.round(sampleWidth / viewport.aspect));
+
+    const particleCount = sampleWidth * sampleHeight;
+
+    debugLog("[Vis1 Sample]", {
+      breakpoint: viewport.breakpoint,
+      viewport: `${viewport.width}×${viewport.height}`,
+      aspect: viewport.aspect.toFixed(3),
+      sampleWidth,
+      sampleHeight,
+      particles: particleCount.toLocaleString()
+    });
+
+    return {
+      width: Math.max(2, Math.floor(sampleWidth)),
+      height: sampleHeight
+    };
+  }
+
   function getPlaneSize(imageWidth, imageHeight) {
     const imageAspect = imageWidth / imageHeight;
     const { width: viewWidth, height: viewHeight } = getContainerSize();
@@ -915,15 +964,15 @@ const Vis1 = (() => {
     if (imageAspect > viewAspect) {
       const width = 6;
       return {
-        width,
-        height: width / imageAspect
+        width: height * imageAspect * CONFIG.PLANE_OVERSCAN_X,
+        height: height * CONFIG.PLANE_OVERSCAN_Y
       };
     }
 
     const height = 4;
     return {
-      width: height * imageAspect,
-      height
+      width: height * imageAspect * CONFIG.PLANE_OVERSCAN_X,
+      height: height * CONFIG.PLANE_OVERSCAN_Y
     };
   }
 
@@ -940,11 +989,10 @@ const Vis1 = (() => {
     const image = texture.image;
     const aspect = image.width / image.height;
 
-    const sampleWidth = Math.max(2, Math.floor(CONFIG.SAMPLE_WIDTH));
-    const sampleHeight =
-      CONFIG.SAMPLE_HEIGHT > 0
-        ? Math.max(2, Math.floor(CONFIG.SAMPLE_HEIGHT))
-        : Math.max(2, Math.floor(sampleWidth / aspect));
+    const sampleSize = getResponsiveSampleSize();
+
+    const sampleWidth = sampleSize.width;
+    const sampleHeight = sampleSize.height;
 
     const offCanvas = document.createElement("canvas");
     offCanvas.width = sampleWidth;
@@ -956,24 +1004,8 @@ const Vis1 = (() => {
     ctx.drawImage(image, 0, 0, sampleWidth, sampleHeight);
 
     const data = ctx.getImageData(0, 0, sampleWidth, sampleHeight).data;
-    const plane = getPlaneSize(image.width, image.height);
 
-    const planeAspect = plane.width / plane.height;
-    const imageAspect = image.width / image.height;
-
-    let uvScaleX = 1.0;
-    let uvScaleY = 1.0;
-
-    let uvOffsetX = 0.0;
-    let uvOffsetY = 0.0;
-
-    if (imageAspect > planeAspect) {
-      uvScaleX = planeAspect / imageAspect;
-      uvOffsetX = (1.0 - uvScaleX) * 0.5;
-    } else {
-      uvScaleY = imageAspect / planeAspect;
-      uvOffsetY = (1.0 - uvScaleY) * 0.5;
-    }
+    const plane = getPlaneSize(sampleWidth, sampleHeight);
 
     currentPlaneHalfWidth = plane.width * 0.5;
     currentPlaneHalfHeight = plane.height * 0.5;
@@ -995,9 +1027,9 @@ const Vis1 = (() => {
 
         positions.push(px, py, 0);
         startPositions.push(px, py, 0);
-        const u = uvOffsetX + (x / (sampleWidth - 1)) * uvScaleX;
+        const u = x / (sampleWidth - 1);
 
-        const v = uvOffsetY + (1 - y / (sampleHeight - 1)) * uvScaleY;
+        const v = 1 - y / (sampleHeight - 1);
 
         uvs.push(u, v);
         delays.push(Math.random() * CONFIG.RANDOM_DELAY_MS);
@@ -1016,8 +1048,8 @@ const Vis1 = (() => {
     if (!points) return;
 
     points.position.y =
-  CONFIG.BASE_POS_Y +
-  scrollOutroProgress * (TRANSITION.TO_TARGET_POS_Y - CONFIG.BASE_POS_Y);
+      CONFIG.BASE_POS_Y +
+      scrollOutroProgress * (TRANSITION.TO_TARGET_POS_Y - CONFIG.BASE_POS_Y);
 
     scene.remove(points);
 
@@ -1388,20 +1420,19 @@ const Vis1 = (() => {
     }
   }
 
-    function startInitialIntroOnce() {
-  if (initialIntroStarted) return;
-  if (!texturesLoaded || !points || !material) return;
+  function startInitialIntroOnce() {
+    if (initialIntroStarted) return;
+    if (!texturesLoaded || !points || !material) return;
 
-  initialIntroStarted = true;
+    initialIntroStarted = true;
 
-  points.visible = true;
+    points.visible = true;
 
-  setState("transitionIn");
-  setPhaseUniforms(2.0, 0.0, CONFIG.TRANSITION_IN_DURATION_MS);
+    setState("transitionIn");
+    setPhaseUniforms(2.0, 0.0, CONFIG.TRANSITION_IN_DURATION_MS);
 
-  restartPulse();
-
-}
+    restartPulse();
+  }
 
   function updatePointerState(nowMs) {
     updateIntroInfluence(nowMs);
@@ -1652,14 +1683,12 @@ const Vis1 = (() => {
     }
 
     points.position.x =
-  CONFIG.BASE_POS_X +
-  scrollOutroProgress *
-    (TRANSITION.TO_TARGET_POS_X - CONFIG.BASE_POS_X);
+      CONFIG.BASE_POS_X +
+      scrollOutroProgress * (TRANSITION.TO_TARGET_POS_X - CONFIG.BASE_POS_X);
 
-points.position.y =
-  CONFIG.BASE_POS_Y +
-  scrollOutroProgress *
-    (TRANSITION.TO_TARGET_POS_Y - CONFIG.BASE_POS_Y);
+    points.position.y =
+      CONFIG.BASE_POS_Y +
+      scrollOutroProgress * (TRANSITION.TO_TARGET_POS_Y - CONFIG.BASE_POS_Y);
 
     points.rotation.x +=
       (targetRotation.x - points.rotation.x) * CONFIG.ROTATION_LERP;
@@ -1695,9 +1724,21 @@ points.position.y =
           texture.colorSpace = THREE.SRGBColorSpace;
 
           const sourceImage = texture.image;
-          const targetW = CONFIG.IMAGE_FRAME_WIDTH;
-          const targetH = CONFIG.IMAGE_FRAME_HEIGHT;
-          const targetAspect = targetW / targetH;
+
+          const viewport =
+            typeof app.getViewportProfile === "function"
+              ? app.getViewportProfile()
+              : {
+                  width: window.innerWidth || 1,
+                  height: window.innerHeight || 1,
+                  aspect: (window.innerWidth || 1) / (window.innerHeight || 1)
+                };
+
+          const sampleSize = getResponsiveSampleSize();
+
+          const targetW = sampleSize.width;
+          const targetH = sampleSize.height;
+          const targetAspect = viewport.aspect;
           const sourceAspect = sourceImage.width / sourceImage.height;
 
           const canvas = document.createElement("canvas");
@@ -1742,62 +1783,60 @@ points.position.y =
       initPointerStateBeforeFirstRender();
       loadMouseMask();
       statsEl = document.getElementById("stats");
-try {
-  IMAGE_URLS = await waitForImageUrls('.urls', 1, 5000);
+      try {
+        IMAGE_URLS = await waitForImageUrls(".urls", 1, 5000);
 
-  const results = await Promise.allSettled(IMAGE_URLS.map(loadTexture));
+        const results = await Promise.allSettled(IMAGE_URLS.map(loadTexture));
 
-  textures = results
-    .filter((result) => result.status === 'fulfilled')
-    .map((result) => result.value);
+        textures = results
+          .filter((result) => result.status === "fulfilled")
+          .map((result) => result.value);
 
-  if (!textures.length) {
-    throw new Error('No Vis 1 textures loaded');
-  }
+        if (!textures.length) {
+          throw new Error("No Vis 1 textures loaded");
+        }
 
-  texturesLoaded = true;
+        texturesLoaded = true;
 
-  shuffleImageIndexes();
+        shuffleImageIndexes();
 
-  currentImageIndex = getNextImageIndex();
-  nextImageIndex = getNextImageIndex();
+        currentImageIndex = getNextImageIndex();
+        nextImageIndex = getNextImageIndex();
 
-  buildParticles(textures[currentImageIndex]);
+        buildParticles(textures[currentImageIndex]);
 
-  window.AIM_VIS1_READY = true;
+        window.AIM_VIS1_READY = true;
 
-  window.dispatchEvent(
-    new CustomEvent('aimVisualReady', {
-      detail: { id: 'vis-1' },
-    })
-  );
-
-
-} catch (error) {
-  console.error("Vis 1 setup failed:", error);
-}
+        window.dispatchEvent(
+          new CustomEvent("aimVisualReady", {
+            detail: { id: "vis-1" }
+          })
+        );
+      } catch (error) {
+        console.error("Vis 1 setup failed:", error);
+      }
     },
 
-enter(app, progress = {}) {
-  isActive = true;
-  addListeners();
+    enter(app, progress = {}) {
+      isActive = true;
+      addListeners();
 
-  if (!points && texturesLoaded) {
-    buildParticles(textures[currentImageIndex]);
-  }
+      if (!points && texturesLoaded) {
+        buildParticles(textures[currentImageIndex]);
+      }
 
-  if (points) {
-    points.visible = true;
-  }
+      if (points) {
+        points.visible = true;
+      }
 
-  if (!initialIntroStarted) {
-    startInitialIntroOnce();
-  } else {
-    resetToDisplayPhase();
-  }
-},
+      if (!initialIntroStarted) {
+        startInitialIntroOnce();
+      } else {
+        resetToDisplayPhase();
+      }
+    },
 
-update(app, progress) {
+    update(app, progress) {
       const exitProgress = progress.exitProgress || 0;
 
       scrollOutroProgress = clamp01(exitProgress);
