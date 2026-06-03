@@ -610,7 +610,9 @@
     function showLogoEnabled() {
       if (!sectionEl) return true;
 
-      return !sectionEl.hasAttribute("hide-logo");
+      const isHidden = window.getComputedStyle(sectionEl).display === "none";
+
+      return !sectionEl.hasAttribute("hide-logo") && !isHidden;
     }
 
     function clamp01(v) {
