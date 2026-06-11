@@ -1721,6 +1721,16 @@ const Vis1 = (() => {
     const url = VIDEO_URLS[index];
 
     const promise = new Promise((resolve, reject) => {
+      if (!url || !url.includes(".m3u8")) {
+        reject(new Error(`Vis 1 expected HLS .m3u8 video URL, got: ${url}`));
+        return;
+      }
+
+      if (!window.Hls || !window.Hls.isSupported()) {
+        reject(new Error("HLS.js is not available or not supported"));
+        return;
+      }
+
       const video = createVideoElement(url);
       let resolved = false;
 
@@ -1745,7 +1755,7 @@ const Vis1 = (() => {
 
       function onError() {
         videoLoadPromises.delete(index);
-        reject(new Error(`Failed to load Vis 1 video: ${url}`));
+        reject(new Error(`Failed to load Vis 1 HLS video: ${url}`));
       }
 
       video.addEventListener("loadedmetadata", resolveOnce);
@@ -1753,43 +1763,34 @@ const Vis1 = (() => {
       video.addEventListener("canplay", resolveOnce);
       video.addEventListener("error", onError);
 
-      if (url.includes(".m3u8")) {
-        if (window.Hls && window.Hls.isSupported()) {
-          const hls = new window.Hls({
-            autoStartLoad: true,
-            startPosition: 0
-          });
+      const hls = new window.Hls({
+        autoStartLoad: true,
+        startPosition: 0
+      });
 
-          video.__hls = hls;
+      video.__hls = hls;
 
-          hls.on(window.Hls.Events.MEDIA_ATTACHED, () => {
-            hls.loadSource(url);
-          });
+      hls.on(window.Hls.Events.MEDIA_ATTACHED, () => {
+        hls.loadSource(url);
+      });
 
-          hls.on(window.Hls.Events.MANIFEST_PARSED, () => {
-            resolveOnce();
-          });
+      hls.on(window.Hls.Events.MANIFEST_PARSED, () => {
+        resolveOnce();
+      });
 
-          hls.on(window.Hls.Events.ERROR, (event, data) => {
-            if (!data || !data.fatal) return;
+      hls.on(window.Hls.Events.ERROR, (event, data) => {
+        if (!data || !data.fatal) return;
 
-            videoLoadPromises.delete(index);
+        videoLoadPromises.delete(index);
 
-            reject(
-              new Error(
-                `Fatal HLS error: type=${data.type}, details=${data.details}, url=${url}`
-              )
-            );
-          });
+        reject(
+          new Error(
+            `Fatal HLS error: type=${data.type}, details=${data.details}, url=${url}`
+          )
+        );
+      });
 
-          hls.attachMedia(video);
-        } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-          video.src = url;
-          video.load();
-        } else {
-          reject(new Error("HLS is not supported in this browser"));
-        }
-      }
+      hls.attachMedia(video);
     });
 
     videoLoadPromises.set(index, promise);
@@ -1798,23 +1799,21 @@ const Vis1 = (() => {
   }
 
   function playVideo(index) {
-  const video = videoEls[index];
-  if (!video) return Promise.resolve(false);
+    const video = videoEls[index];
+    if (!video) return Promise.resolve(false);
 
-  video.muted = true;
-  video.loop = true;
-  video.playsInline = true;
+    video.muted = true;
+    video.loop = true;
+    video.playsInline = true;
 
-  const playPromise = video.play();
+    const playPromise = video.play();
 
-  if (playPromise && typeof playPromise.then === "function") {
-    return playPromise
-      .then(() => true)
-      .catch(() => false);
+    if (playPromise && typeof playPromise.then === "function") {
+      return playPromise.then(() => true).catch(() => false);
+    }
+
+    return Promise.resolve(true);
   }
-
-  return Promise.resolve(true);
-}
 
   function pauseVideo(index) {
     const video = videoEls[index];
@@ -1921,9 +1920,9 @@ const Vis1 = (() => {
         buildParticles(textures[currentImageIndex]);
 
         await playVideo(currentImageIndex);
-        
+
         window.AIM_VIS1_READY = true;
-        
+
         window.dispatchEvent(
           new CustomEvent("aimVisualReady", {
             detail: { id: "vis-1" }
@@ -2050,4 +2049,5 @@ const Vis1 = (() => {
 })();
 
 window.AIM.register("vis-1", Vis1);
+
 })();
