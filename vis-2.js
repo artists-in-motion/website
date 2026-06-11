@@ -128,7 +128,7 @@
 
     TO_START_OFFSET: 0.5, // 0 = normal, 0.15 = starts 15vh earlier
     TO_WHITE_MIX: 0.5, // 0 = keep colour, 1 = fade to white during TO
-    TO_WHITE_POWER: 0.0, // lower = turns white earlier, 1 = normal, higher = later
+    TO_WHITE_POWER: 1.0, // lower = turns white earlier, 1 = normal, higher = later
     TO_OPACITY_BOOST: 3.0, // 1 = normal, 2 = brighter/more opaque during TO
 
     TO_PARTICLE_LIFT_Y: 0.8, // individual particle lift/scatter during TO
