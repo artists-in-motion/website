@@ -1,4 +1,4 @@
-console.log("THU 11th JUN");
+console.log("THU 11th JUN v2");
 (function startWhenAIMReady() {
     if (!window.AIM) {
       window.addEventListener('aimGlobalReady', startWhenAIMReady, {
@@ -2049,5 +2049,4 @@ const Vis1 = (() => {
 })();
 
 window.AIM.register("vis-1", Vis1);
-
 })();
