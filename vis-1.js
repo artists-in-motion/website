@@ -1798,19 +1798,23 @@ const Vis1 = (() => {
   }
 
   function playVideo(index) {
-    const video = videoEls[index];
-    if (!video) return;
+  const video = videoEls[index];
+  if (!video) return Promise.resolve(false);
 
-    video.muted = true;
-    video.loop = true;
-    video.playsInline = true;
+  video.muted = true;
+  video.loop = true;
+  video.playsInline = true;
 
-    const playPromise = video.play();
+  const playPromise = video.play();
 
-    if (playPromise && typeof playPromise.catch === "function") {
-      playPromise.catch(() => {});
-    }
+  if (playPromise && typeof playPromise.then === "function") {
+    return playPromise
+      .then(() => true)
+      .catch(() => false);
   }
+
+  return Promise.resolve(true);
+}
 
   function pauseVideo(index) {
     const video = videoEls[index];
@@ -1916,10 +1920,10 @@ const Vis1 = (() => {
 
         buildParticles(textures[currentImageIndex]);
 
-        playVideo(currentImageIndex);
-
+        await playVideo(currentImageIndex);
+        
         window.AIM_VIS1_READY = true;
-
+        
         window.dispatchEvent(
           new CustomEvent("aimVisualReady", {
             detail: { id: "vis-1" }
