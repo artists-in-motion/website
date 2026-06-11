@@ -1,4 +1,4 @@
-//console.log("THU 4th JUN");
+console.log("THU 11th JUN");
 (function startWhenAIMReady() {
     if (!window.AIM) {
       window.addEventListener('aimGlobalReady', startWhenAIMReady, {
@@ -15,11 +15,10 @@ const scene = app.scene;
 const renderer = app.renderer;
 const clock = app.clock;
 
-// === IMAGE URLS === //
-// Uses global AIM image helper
-// Second value = max number of images / No second value to return all images
-// Example window.AIM.getImageUrls('.urls', 6); / will fetch 6 images
-let IMAGE_URLS = [];
+// === VIDEO URLS === //
+// Only the current video and the next video are loaded at any one time.
+// Add more URLs to this array and Vis 1 will cycle through them using the existing particle transition.
+let VIDEO_URLS = [];
 
 const MOUSE_SHAPE_SVG = `
 <svg width="100%" style="" viewBox="0 0 225 237" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -366,46 +365,19 @@ function debugLog(...args) {
   console.log(...args);
 }
 
-function waitForImageUrls(selector = ".urls", minCount = 1, timeoutMs = 5000) {
-  return new Promise((resolve) => {
-    const start = performance.now();
-
-    function getCmsUrls() {
-      return [...document.querySelectorAll(selector)]
-        .map((el) => el.textContent.trim())
-        .filter((url) => url.startsWith("http"));
-    }
-
-    function check() {
-      const cmsUrls = getCmsUrls();
-
-      if (cmsUrls.length >= minCount) {
-        resolve(window.AIM.getImageUrls(selector));
-        return;
-      }
-
-      if (performance.now() - start >= timeoutMs) {
-        resolve(window.AIM.getImageUrls(selector));
-        return;
-      }
-
-      requestAnimationFrame(check);
-    }
-
-    check();
-  });
+function isFiniteVideoDuration(video) {
+  return video && Number.isFinite(video.duration) && video.duration > 0;
 }
 
 const Vis1 = (() => {
-  const loader = new THREE.TextureLoader();
-  loader.setCrossOrigin("anonymous");
-
   let statsEl = null; // debugger
 
   let points = null;
   let geometry = null;
   let material = null;
   let textures = [];
+  let videoEls = [];
+  let videoLoadPromises = new Map();
 
   let mouseMaskCanvas = null;
   let mouseMaskCtx = null;
@@ -517,7 +489,7 @@ const Vis1 = (() => {
 
   function shuffleImageIndexes() {
     shuffledImageIndexes = Array.from(
-      { length: IMAGE_URLS.length },
+      { length: VIDEO_URLS.length },
       (_, i) => i
     );
 
@@ -926,17 +898,17 @@ const Vis1 = (() => {
 
     let sampleWidth = CONFIG.SAMPLE_WIDTH_DESKTOP || 600;
 
-   if (viewport.breakpoint === "tablet") {
-  sampleWidth = CONFIG.SAMPLE_WIDTH_TABLET || sampleWidth;
-}
+    if (viewport.breakpoint === "tablet") {
+      sampleWidth = CONFIG.SAMPLE_WIDTH_TABLET || sampleWidth;
+    }
 
-if (viewport.breakpoint === "mobileLandscape") {
-  sampleWidth = CONFIG.SAMPLE_WIDTH_MOBILE_LANDSCAPE || sampleWidth;
-}
+    if (viewport.breakpoint === "mobileLandscape") {
+      sampleWidth = CONFIG.SAMPLE_WIDTH_MOBILE_LANDSCAPE || sampleWidth;
+    }
 
-if (viewport.breakpoint === "mobilePortrait") {
-  sampleWidth = CONFIG.SAMPLE_WIDTH_MOBILE_PORTRAIT || sampleWidth;
-}
+    if (viewport.breakpoint === "mobilePortrait") {
+      sampleWidth = CONFIG.SAMPLE_WIDTH_MOBILE_PORTRAIT || sampleWidth;
+    }
 
     const sampleHeight = Math.max(2, Math.round(sampleWidth / viewport.aspect));
 
@@ -957,30 +929,30 @@ if (viewport.breakpoint === "mobilePortrait") {
     };
   }
 
- function getPlaneSize(imageWidth, imageHeight) {
-  const imageAspect = imageWidth / imageHeight;
-  const { width: viewWidth, height: viewHeight } = getContainerSize();
-  const viewAspect = viewWidth / viewHeight;
+  function getPlaneSize(imageWidth, imageHeight) {
+    const imageAspect = imageWidth / imageHeight;
+    const { width: viewWidth, height: viewHeight } = getContainerSize();
+    const viewAspect = viewWidth / viewHeight;
 
-  const overscanX = CONFIG.PLANE_OVERSCAN_X || 1.0;
-  const overscanY = CONFIG.PLANE_OVERSCAN_Y || 1.0;
+    const overscanX = CONFIG.PLANE_OVERSCAN_X || 1.0;
+    const overscanY = CONFIG.PLANE_OVERSCAN_Y || 1.0;
 
-  if (imageAspect > viewAspect) {
-    const width = 6;
+    if (imageAspect > viewAspect) {
+      const width = 6;
+
+      return {
+        width: width * overscanX,
+        height: (width / imageAspect) * overscanY
+      };
+    }
+
+    const height = 4;
 
     return {
-      width: width * overscanX,
-      height: (width / imageAspect) * overscanY
+      width: height * imageAspect * overscanX,
+      height: height * overscanY
     };
   }
-
-  const height = 4;
-
-  return {
-    width: height * imageAspect * overscanX,
-    height: height * overscanY
-  };
-}
 
   function getNormalizedPointer(clientX, clientY) {
     const rect = container.getBoundingClientRect();
@@ -993,25 +965,17 @@ if (viewport.breakpoint === "mobilePortrait") {
 
   function buildParticleData(texture) {
     const image = texture.image;
-    const aspect = image.width / image.height;
+
+    const sourceWidth = image.videoWidth || image.width || 16;
+
+    const sourceHeight = image.videoHeight || image.height || 9;
 
     const sampleSize = getResponsiveSampleSize();
 
     const sampleWidth = sampleSize.width;
     const sampleHeight = sampleSize.height;
 
-    const offCanvas = document.createElement("canvas");
-    offCanvas.width = sampleWidth;
-    offCanvas.height = sampleHeight;
-
-    const ctx = offCanvas.getContext("2d", {
-      willReadFrequently: true
-    });
-    ctx.drawImage(image, 0, 0, sampleWidth, sampleHeight);
-
-    const data = ctx.getImageData(0, 0, sampleWidth, sampleHeight).data;
-
-    const plane = getPlaneSize(sampleWidth, sampleHeight);
+    const plane = getPlaneSize(sourceWidth, sourceHeight);
 
     currentPlaneHalfWidth = plane.width * 0.5;
     currentPlaneHalfHeight = plane.height * 0.5;
@@ -1023,18 +987,13 @@ if (viewport.breakpoint === "mobilePortrait") {
 
     for (let y = 0; y < sampleHeight; y++) {
       for (let x = 0; x < sampleWidth; x++) {
-        const i = (y * sampleWidth + x) * 4;
-        const a = data[i + 3] / 255;
-
-        if (a <= CONFIG.ALPHA_CUTOFF) continue;
-
         const px = (x / (sampleWidth - 1) - 0.5) * plane.width;
         const py = -(y / (sampleHeight - 1) - 0.5) * plane.height;
 
         positions.push(px, py, 0);
         startPositions.push(px, py, 0);
-        const u = x / (sampleWidth - 1);
 
+        const u = x / (sampleWidth - 1);
         const v = 1 - y / (sampleHeight - 1);
 
         uvs.push(u, v);
@@ -1391,9 +1350,9 @@ if (viewport.breakpoint === "mobilePortrait") {
   }
 
   function startCycle() {
-    if (!material || textures.length < 2) return;
+    if (!material || VIDEO_URLS.length < 2) return;
+    if (!textures[nextImageIndex]) return;
 
-    nextImageIndex = getNextImageIndex();
     setState("transitionOut");
     setPhaseUniforms(1.0, 0.0, CONFIG.TRANSITION_OUT_DURATION_MS);
   }
@@ -1406,8 +1365,19 @@ if (viewport.breakpoint === "mobilePortrait") {
   }
 
   function swapHiddenImage() {
+    const previousIndex = currentImageIndex;
+
+    pauseVideo(previousIndex);
+
     currentImageIndex = nextImageIndex;
     material.uniforms.uTexture.value = textures[currentImageIndex];
+
+    playVideo(currentImageIndex);
+
+    nextImageIndex = getNextImageIndex();
+
+    disposeVideoAtIndex(previousIndex);
+    preloadNextVideo();
   }
 
   function resetToDisplayPhase() {
@@ -1639,7 +1609,7 @@ if (viewport.breakpoint === "mobilePortrait") {
       if (
         CONFIG.AUTO_START &&
         !imageCyclePaused &&
-        nowMs - stateStartMs >= CONFIG.DISPLAY_TIME_MS
+        shouldStartVideoTransition(nowMs)
       ) {
         startCycle();
       }
@@ -1722,66 +1692,190 @@ if (viewport.breakpoint === "mobilePortrait") {
     listenersAttached = false;
   }
 
-  function loadTexture(url) {
-    return new Promise((resolve, reject) => {
-      loader.load(
-        url,
-        (texture) => {
-          texture.colorSpace = THREE.SRGBColorSpace;
+  function createVideoElement(url) {
+    const video = document.createElement("video");
 
-          const sourceImage = texture.image;
+    video.crossOrigin = "anonymous";
+    video.muted = true;
+    video.loop = true;
+    video.playsInline = true;
+    video.autoplay = false;
+    video.preload = "auto";
 
-          const viewport =
-            typeof app.getViewportProfile === "function"
-              ? app.getViewportProfile()
-              : {
-                  width: window.innerWidth || 1,
-                  height: window.innerHeight || 1,
-                  aspect: (window.innerWidth || 1) / (window.innerHeight || 1)
-                };
+    video.setAttribute("muted", "");
+    video.setAttribute("playsinline", "");
+    video.setAttribute("webkit-playsinline", "");
 
-          const sampleSize = getResponsiveSampleSize();
+    return video;
+  }
 
-          const targetW = sampleSize.width;
-          const targetH = sampleSize.height;
-          const targetAspect = viewport.aspect;
-          const sourceAspect = sourceImage.width / sourceImage.height;
+  function loadVideoTexture(index) {
+    if (textures[index]) {
+      return Promise.resolve(textures[index]);
+    }
 
-          const canvas = document.createElement("canvas");
-          canvas.width = targetW;
-          canvas.height = targetH;
+    if (videoLoadPromises.has(index)) {
+      return videoLoadPromises.get(index);
+    }
 
-          const ctx = canvas.getContext("2d");
+    const url = VIDEO_URLS[index];
 
-          let drawW;
-          let drawH;
-          let drawX;
-          let drawY;
+    const promise = new Promise((resolve, reject) => {
+      const video = createVideoElement(url);
+      let resolved = false;
 
-          if (sourceAspect > targetAspect) {
-            drawH = targetH;
-            drawW = targetH * sourceAspect;
-            drawX = (targetW - drawW) * 0.5;
-            drawY = 0;
-          } else {
-            drawW = targetW;
-            drawH = targetW / sourceAspect;
-            drawX = 0;
-            drawY = (targetH - drawH) * 0.5;
-          }
+      function resolveOnce() {
+        if (resolved) return;
 
-          ctx.drawImage(sourceImage, drawX, drawY, drawW, drawH);
+        resolved = true;
 
-          const coverTexture = new THREE.CanvasTexture(canvas);
-          coverTexture.colorSpace = THREE.SRGBColorSpace;
-          coverTexture.needsUpdate = true;
+        videoEls[index] = video;
 
-          resolve(coverTexture);
-        },
-        undefined,
-        reject
-      );
+        const texture = new THREE.VideoTexture(video);
+        texture.colorSpace = THREE.SRGBColorSpace;
+        texture.minFilter = THREE.LinearFilter;
+        texture.magFilter = THREE.LinearFilter;
+        texture.generateMipmaps = false;
+        texture.needsUpdate = true;
+
+        textures[index] = texture;
+
+        resolve(texture);
+      }
+
+      function onError() {
+        videoLoadPromises.delete(index);
+        reject(new Error(`Failed to load Vis 1 video: ${url}`));
+      }
+
+      video.addEventListener("loadedmetadata", resolveOnce);
+      video.addEventListener("loadeddata", resolveOnce);
+      video.addEventListener("canplay", resolveOnce);
+      video.addEventListener("error", onError);
+
+      if (url.includes(".m3u8")) {
+        if (window.Hls && window.Hls.isSupported()) {
+          const hls = new window.Hls({
+            autoStartLoad: true,
+            startPosition: 0
+          });
+
+          video.__hls = hls;
+
+          hls.on(window.Hls.Events.MEDIA_ATTACHED, () => {
+            hls.loadSource(url);
+          });
+
+          hls.on(window.Hls.Events.MANIFEST_PARSED, () => {
+            resolveOnce();
+          });
+
+          hls.on(window.Hls.Events.ERROR, (event, data) => {
+            if (!data || !data.fatal) return;
+
+            videoLoadPromises.delete(index);
+
+            reject(
+              new Error(
+                `Fatal HLS error: type=${data.type}, details=${data.details}, url=${url}`
+              )
+            );
+          });
+
+          hls.attachMedia(video);
+        } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+          video.src = url;
+          video.load();
+        } else {
+          reject(new Error("HLS is not supported in this browser"));
+        }
+      }
     });
+
+    videoLoadPromises.set(index, promise);
+
+    return promise;
+  }
+
+  function playVideo(index) {
+    const video = videoEls[index];
+    if (!video) return;
+
+    video.muted = true;
+    video.loop = true;
+    video.playsInline = true;
+
+    const playPromise = video.play();
+
+    if (playPromise && typeof playPromise.catch === "function") {
+      playPromise.catch(() => {});
+    }
+  }
+
+  function pauseVideo(index) {
+    const video = videoEls[index];
+    if (!video) return;
+
+    video.pause();
+  }
+
+  function disposeVideoAtIndex(index) {
+    if (index === currentImageIndex || index === nextImageIndex) return;
+
+    const texture = textures[index];
+    if (texture) {
+      texture.dispose();
+      textures[index] = null;
+    }
+
+    const video = videoEls[index];
+    if (video) {
+      if (video.__hls) {
+        video.__hls.destroy();
+        video.__hls = null;
+      }
+
+      video.pause();
+      video.removeAttribute("src");
+      video.load();
+      videoEls[index] = null;
+    }
+
+    videoLoadPromises.delete(index);
+  }
+
+  function preloadNextVideo() {
+    if (VIDEO_URLS.length < 2) return Promise.resolve(null);
+    if (nextImageIndex == null) return Promise.resolve(null);
+
+    return loadVideoTexture(nextImageIndex).catch((error) => {
+      console.error("Vis 1 next video preload failed:", error);
+      return null;
+    });
+  }
+
+  function shouldStartVideoTransition(nowMs) {
+    if (VIDEO_URLS.length < 2) return false;
+    if (imageCyclePaused) return false;
+
+    if (!textures[nextImageIndex]) {
+      preloadNextVideo();
+      return false;
+    }
+
+    const elapsedDisplay = nowMs - stateStartMs;
+    const video = videoEls[currentImageIndex];
+
+    if (!isFiniteVideoDuration(video)) {
+      return elapsedDisplay >= CONFIG.DISPLAY_TIME_MS;
+    }
+
+    const remainingMs = (video.duration - video.currentTime) * 1000;
+
+    return (
+      elapsedDisplay >= CONFIG.VIDEO_MIN_DISPLAY_MS &&
+      remainingMs <= CONFIG.VIDEO_FADE_BEFORE_END_MS
+    );
   }
 
   return {
@@ -1789,27 +1883,40 @@ if (viewport.breakpoint === "mobilePortrait") {
       initPointerStateBeforeFirstRender();
       loadMouseMask();
       statsEl = document.getElementById("stats");
+
       try {
-        IMAGE_URLS = await waitForImageUrls(".urls", 1, 5000);
+        VIDEO_URLS = window.AIM.getVideoUrls(".video-urls");
 
-        const results = await Promise.allSettled(IMAGE_URLS.map(loadTexture));
+        console.log("[Vis1 Video] URLs found:", VIDEO_URLS);
 
-        textures = results
-          .filter((result) => result.status === "fulfilled")
-          .map((result) => result.value);
-
-        if (!textures.length) {
-          throw new Error("No Vis 1 textures loaded");
+        if (!VIDEO_URLS.length) {
+          throw new Error("No Vis 1 video URLs configured");
         }
-
-        texturesLoaded = true;
 
         shuffleImageIndexes();
 
         currentImageIndex = getNextImageIndex();
-        nextImageIndex = getNextImageIndex();
+        nextImageIndex =
+          VIDEO_URLS.length > 1 ? getNextImageIndex() : currentImageIndex;
+
+        console.log("[Vis1 Video] Current loading:", {
+          index: currentImageIndex,
+          url: VIDEO_URLS[currentImageIndex]
+        });
+
+        console.log("[Vis1 Video] Next preload:", {
+          index: nextImageIndex,
+          url: VIDEO_URLS[nextImageIndex]
+        });
+
+        await loadVideoTexture(currentImageIndex);
+        await preloadNextVideo();
+
+        texturesLoaded = true;
 
         buildParticles(textures[currentImageIndex]);
+
+        playVideo(currentImageIndex);
 
         window.AIM_VIS1_READY = true;
 
@@ -1819,7 +1926,8 @@ if (viewport.breakpoint === "mobilePortrait") {
           })
         );
       } catch (error) {
-        console.error("Vis 1 setup failed:", error);
+        console.error("Vis 1 setup failed:", error?.message || error);
+        console.error(error?.stack || error);
       }
     },
 
@@ -1834,6 +1942,9 @@ if (viewport.breakpoint === "mobilePortrait") {
       if (points) {
         points.visible = true;
       }
+
+      playVideo(currentImageIndex);
+      preloadNextVideo();
 
       if (!initialIntroStarted) {
         startInitialIntroOnce();
@@ -1870,6 +1981,13 @@ if (viewport.breakpoint === "mobilePortrait") {
       const nowMs = getNowMs();
       const nowSeconds = nowMs / 1000;
 
+      if (
+        textures[currentImageIndex] &&
+        textures[currentImageIndex].isVideoTexture
+      ) {
+        textures[currentImageIndex].needsUpdate = true;
+      }
+
       fadeMousePaint();
       paintMouseShape();
 
@@ -1883,6 +2001,7 @@ if (viewport.breakpoint === "mobilePortrait") {
     exit() {
       isActive = false;
       removeListeners();
+      pauseVideo(currentImageIndex);
 
       if (points) {
         points.visible = false;
@@ -1891,6 +2010,27 @@ if (viewport.breakpoint === "mobilePortrait") {
 
     destroy() {
       disposePoints();
+
+      textures.forEach((texture) => {
+        if (texture) texture.dispose();
+      });
+
+      videoEls.forEach((video) => {
+        if (!video) return;
+
+        if (video.__hls) {
+          video.__hls.destroy();
+          video.__hls = null;
+        }
+
+        video.pause();
+        video.removeAttribute("src");
+        video.load();
+      });
+
+      textures = [];
+      videoEls = [];
+      videoLoadPromises.clear();
     },
 
     resize() {
