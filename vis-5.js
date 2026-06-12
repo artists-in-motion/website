@@ -1,3 +1,4 @@
+//console.log("THU 11th JUN");
 (function startWhenAIMReady() {
   if (!window.AIM) {
     window.addEventListener("aimGlobalReady", startWhenAIMReady, {
@@ -273,7 +274,31 @@
     function randomRange(min, max) {
       return min + Math.random() * (max - min);
     }
+let imageBag = [];
 
+function shuffleArray(array) {
+  const copy = [...array];
+
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+
+  return copy;
+}
+
+function getNextImageIndex() {
+  if (!textures.length) return 0;
+
+  if (!imageBag.length) {
+    imageBag = shuffleArray(
+      textures.map((_, index) => index)
+    );
+  }
+
+  return imageBag.pop();
+}
     function randomOnSphere(radius) {
       const v = new THREE.Vector3(
         Math.random() - 0.5,
@@ -492,6 +517,7 @@
 
     async function loadTextures() {
       textures = await Promise.all(IMAGE_URLS.map((url) => loadTexture(url)));
+      imageBag = [];
     }
 
     function getCoverCrop(texture) {
@@ -716,7 +742,7 @@
       const options = textures.map((_, index) => index);
 
       for (let attempt = 0; attempt < 20; attempt++) {
-        const imageIndex = options[Math.floor(Math.random() * options.length)];
+        const imageIndex = getNextImageIndex();
 
         if (
           canPlacePatch(
@@ -755,7 +781,7 @@
         return Math.floor(Math.random() * textures.length);
       }
 
-      return options[Math.floor(Math.random() * options.length)];
+      return getNextImageIndex();
     }
 
     function createImagePatchMap(rows, cols) {
@@ -995,7 +1021,7 @@
       for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
           const patch = patchMap[row][col] || {
-            imageIndex: Math.floor(Math.random() * textures.length),
+            iimageIndex: Math.floor(Math.random() * textures.length),
             patchId: patchIdCounter++,
             size: 1,
             x: 0,
