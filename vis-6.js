@@ -1,4 +1,4 @@
-console.log("12 Jun");
+console.log("12 Jun v2");
 (function startWhenAIMReady() {
     if (!window.AIM) {
       window.addEventListener('aimGlobalReady', startWhenAIMReady, {
@@ -18,6 +18,7 @@ console.log("12 Jun");
     // Second value = max number of images / No second value to return all images
     // Example window.AIM.getImageUrls('.urls', 6); / will fetch 6 images
     const IMAGE_URLS = window.AIM.getImageUrls(".image-urls");
+    console.log("[VIS6]", IMAGE_URLS);
 
     const CONFIG = {
       // === IMAGE FRAME / MOSAIC ===
