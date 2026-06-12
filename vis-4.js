@@ -17,7 +17,7 @@
   // Uses global AIM image helper
   // Second value = max number of images / No second value to return all images
   // Example window.AIM.getImageUrls('.urls', 6); / will fetch 6 images
-  const IMAGE_URLS = window.AIM.getImageUrls('.urls');
+  const IMAGE_URLS = window.AIM.getImageUrls('.image-urls');
 
   const CONFIG = {
     // === POSITION / SCALE ===
