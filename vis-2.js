@@ -1,3 +1,4 @@
+//console.log("Vis 2 - THU 12th JUN");
 (function startWhenAIMReady() {
   if (!window.AIM) {
     window.addEventListener("aimGlobalReady", startWhenAIMReady, {
