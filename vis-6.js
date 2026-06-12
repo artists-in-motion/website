@@ -1,3 +1,4 @@
+console.log("Jun 12 v4");
 (function startWhenAIMReady() {
     if (!window.AIM) {
       window.addEventListener('aimGlobalReady', startWhenAIMReady, {
