@@ -1019,7 +1019,7 @@ const Vis5 = (() => {
     for (let row = 0; row < rows; row++) {
       for (let col = 0; col < cols; col++) {
         const patch = patchMap[row][col] || {
-          iimageIndex: Math.floor(Math.random() * textures.length),
+          imageIndex: Math.floor(Math.random() * textures.length),
           patchId: patchIdCounter++,
           size: 1,
           x: 0,
