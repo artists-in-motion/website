@@ -1,3 +1,4 @@
+//console.log("Vis 7 - THU 12th JUN");
 
         const app = window.AIM;
         const THREE = app.THREE;
