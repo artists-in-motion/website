@@ -91,7 +91,7 @@
 
     // SVG LIFT
     SVG_LIFT_START: 0.2, // MS lift start
-    SVG_LIFT_END: 0.6, // MS lift end
+    SVG_LIFT_END: 0.4, // MS lift end
     SVG_LIFT_RANDOM_DELAY: 0.45, // random lift delay
     SVG_LIFT_MIN_HEIGHT: 0.02, // min lift height
     SVG_LIFT_MAX_HEIGHT: 0.2, // max lift height
