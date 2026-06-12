@@ -12,10 +12,13 @@
     const scene = app.scene;
     const container = app.container || document.body;
 
-    const CONFIG = {
-      // === IMAGE INPUTS ===
-      IMAGE_URLS: ['https://cdn.prod.website-files.com/69dec44200d5fa5789162235/6a0d470f53bef97415fa643c_services-cc-3.jpg', 'https://cdn.prod.website-files.com/69dec44200d5fa5789162235/6a0d470fd60de97eda0e4745_services-sd-3.jpg', 'https://cdn.prod.website-files.com/69dec44200d5fa5789162235/69fc3e4104a446665141c025_b315331a6b60a373ff3c62fd52e9a1d7_services-cp-2.jpg', 'https://cdn.prod.website-files.com/69dec44200d5fa5789162235/6a0d470fe2d021788d4be3d5_services-os-1.jpg', 'https://cdn.prod.website-files.com/69dec44200d5fa5789162235/6a0d47109ae48de106727be4_services-sdir-4.jpg', 'https://cdn.prod.website-files.com/69dec44200d5fa5789162235/6a0fd6678918163860cfe524_services-pm-2.jpg'],
+    // === IMAGE URLS === //
+    // Uses global AIM image helper
+    // Second value = max number of images / No second value to return all images
+    // Example window.AIM.getImageUrls('.urls', 6); / will fetch 6 images
+    const IMAGE_URLS = window.AIM.getImageUrls(".image-urls");
 
+    const CONFIG = {
       // === IMAGE FRAME / MOSAIC ===
       FRAME_RATIO_X: 16, // Image frame aspect width.
       FRAME_RATIO_Y: 10, // Image frame aspect height.
@@ -1040,7 +1043,7 @@
 
         scene.add(outerGroup);
 
-        const urls = CONFIG.IMAGE_URLS.slice(0, CONFIG.SECTION_COUNT);
+        const urls = IMAGE_URLS.slice(0, CONFIG.SECTION_COUNT);
 
         const textures = await Promise.all(urls.map(loadTexture));
 
