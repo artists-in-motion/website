@@ -22,121 +22,12 @@
   </svg>
   `;
 
-  const CONFIG = {
-    // PARTICLE GRID
-    PARTICLES_WIDE: 600, // particles across width
-    PARTICLES_DEEP: 150, // particles into depth
-    PARTICLE_SPACING: 0.012, // spacing between particles, higher = wider river
-    POINT_SIZE: 3.0, // particle size
-    USE_ROUND_POINTS: false, // false = square, true = circle
-    ALPHA_CUTOFF: 0.0, // discard particles below this alpha
+  // === CONFIG PULLED FROM WEBFLOW WEBFLOW ===
 
-    // BASE APPEARANCE
-    BASE_ALPHA: 0.5, // overall opacity
-    BACKGROUND_ALPHA_MULTIPLIER: 1.0, // normal river opacity
-    SVG_ALPHA_MULTIPLIER: 0.7, // SVG/lifted particles opacity
-    BACKGROUND_SIZE_MULTIPLIER: 1.0, // normal river size
-    SVG_SIZE_MULTIPLIER: 1.0, // SVG/lifted particle size
-    RIVER_COLOR: "#ffffff", // normal river colour
-    SVG_COLOR: "#ffffff", // SVG fallback colour
+  const CONFIG = window.AIM_VIS2_CONFIG || {};
+  const TRANSITION = window.AIM_VIS2_TRANSITION || {};
 
-    // SVG IMAGE MAPPING
-    SVG_IMAGE_URL:
-      "https://cdn.prod.website-files.com/69dec44200d5fa5789162235/6a0d470fce8ee3c056e98343_services-cc-6.jpg",
-    SVG_IMAGE_MODE: "continuous", // 'continuous' or 'layerTiles'
-    SVG_IMAGE_LAYER_CROP_SHIFT: 20.0, // crop offset per layer
-    SVG_IMAGE_MIX: 0.5, // 0 = SVG_COLOR, 1 = image
-    SVG_IMAGE_BRIGHTNESS: 5.0, // image brightness
-    SVG_IMAGE_ALPHA: 1.0, // image alpha
-    SVG_IMAGE_TO_WHITE: 0.0, // 0 = image, 1 = white
-
-    // SCENE TRANSFORM
-    BASE_ROT_X: -1.1, // tilt into depth
-    BASE_ROT_Y: 0.0, // rotate left/right
-    BASE_ROT_Z: 0.0, // roll
-    BASE_Z_OFFSET: 0.1, // push river forward/back
-
-    // WAVES
-    WAVE_AMPLITUDE: 0.15, // wave height
-    WAVE_FREQUENCY_X: 4.0, // wave frequency across width
-    WAVE_FREQUENCY_Y: 2.0, // wave frequency through depth
-    AUTO_WAVE_SPEED: 0.35, // auto wave speed
-    AUTO_WAVE_TO_FADE_END: 0.5, // auto wave fade point in TO
-    SCROLL_DIRECTION_EPSILON: 0.00001,
-
-    // FRONT / BACK FADE
-    FRONT_FADE_ROWS: 150, // fade rows at front
-    BACK_FADE_ROWS: 50, // fade rows at back
-    MIN_FADE_ALPHA: 0.05, // minimum fade opacity
-
-    // SVG MASK SIZE / POSITION
-    SVG_MASK_DRAW_WIDTH: 1400, // SVG sampling resolution
-    SVG_MASK_ALPHA_THRESHOLD: 20, // SVG pixel threshold
-    SVG_MASK_WIDTH_AUTO: true, // true = width follows SVG aspect
-    SVG_MASK_WIDTH: 8, // manual width if auto false
-    SVG_MASK_HEIGHT: 0.7, // main SVG size control
-    SVG_MASK_POSITION_X: 0.65, // SVG X position
-    SVG_MASK_POSITION_Y: -0.45, // SVG Y position
-    SVG_EDGE_SOFTNESS: 0.0, // reserved
-
-    // SVG / RIVER SCROLL MOTION
-    SVG_MASK_SCROLL_X: -1.0, // SVG mask scroll X
-    SVG_MASK_SCROLL_Y: 0.0, // SVG mask scroll Y
-    RIVER_SCROLL_MOVE_X: -2.0, // river scroll X
-    RIVER_SCROLL_MOVE_Y: 0.0, // river scroll Y
-    RIVER_SCROLL_MOVE_Z: 0.0, // river scroll Z
-
-    // SVG REVEAL
-    SVG_REVEAL_START: 0.5, // TI reveal start
-    SVG_REVEAL_END: 1.0, // TI reveal end
-
-    // SVG LIFT
-    SVG_LIFT_START: 0.1, // MS lift start
-    SVG_LIFT_END: 0.2, // MS lift end
-    SVG_LIFT_RANDOM_DELAY: 0.45, // random lift delay
-    SVG_LIFT_MIN_HEIGHT: 0.02, // min lift height
-    SVG_LIFT_MAX_HEIGHT: 0.2, // max lift height
-    SVG_LIFT_FADE_POWER: 1.4, // lift fade curve
-
-    // SVG FILLER
-    SVG_FILLER_START: 0.08, // filler fade-in start
-    SVG_FILLER_END: 0.45, // filler fully back
-
-    // SVG EXTRUSION
-    SVG_EXTRUDE_LAYERS: 20, // number of stacked layers
-    SVG_EXTRUDE_LAYER_HEIGHT: 0.01, // gap between layers
-    SVG_EXTRUDE_HEIGHT_VARIATION: 0.0 // random layer height variation
-  };
-
-  const TRANSITION = {
-    TI: 100,
-    TO: 100,
-
-    WAVE_SCROLL_DISTANCE: 14.0,
-    TI_WAVE_SCROLL_DISTANCE: 4.0,
-    TO_WAVE_SCROLL_DISTANCE: 5.0,
-
-    TI_FADE_POWER: 1.0,
-    TI_FROM_Y: -0.3,
-    TI_FROM_Z: 0.0,
-    TI_WAVE_BOOST: 0.0,
-
-    TO_SCROLL_CONTINUE_X: -0.6,
-    TO_STAY_PERCENT: 0.15,
-    TO_RANDOM_DELAY_MS: 1000,
-    TO_DURATION_MS: 700,
-    TO_WAVE_BOOST: 0.0,
-
-    TO_START_OFFSET: 0.5, // 0 = normal, 0.15 = starts 15vh earlier
-    TO_WHITE_MIX: 1.0, // 0 = keep colour, 1 = fade to white during TO
-    TO_WHITE_POWER: 1.0, // lower = turns white earlier, 1 = normal, higher = later
-    TO_OPACITY_BOOST: 3.0, // 1 = normal, 2 = brighter/more opaque during TO
-
-    TO_PARTICLE_LIFT_Y: 0.8, // individual particle lift/scatter during TO
-    TO_OBJECT_MOVE_Y: -0.3, // whole river object up/down during TO
-    TO_OBJECT_MOVE_Z: 1.2, // whole river object forward/back during TO
-    TO_OBJECT_ROTATE_X: -0.65 // whole river object X rotation during TO
-  };
+  // === MAIN SCRIPT ===
 
   function getSvgViewBoxAspect(svgString) {
     const match = svgString.match(/viewBox=["']([^"']+)["']/i);
