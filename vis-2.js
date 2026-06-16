@@ -29,7 +29,7 @@
 
   // === MAIN SCRIPT ===
 
- function getSvgViewBoxAspect(svgString) {
+  function getSvgViewBoxAspect(svgString) {
     const match = svgString.match(/viewBox=["']([^"']+)["']/i);
     if (!match) return 1;
 
@@ -69,7 +69,6 @@
   uniform float uRiverScrollMoveX;
   uniform float uRiverScrollMoveY;
   uniform float uRiverScrollMoveZ;
-  uniform float uRiverWrapWidth;
   
   uniform float uRowCount;
   uniform float uFrontFadeRows;
@@ -154,12 +153,6 @@
   vec3 displayPos = aStartPosition;
   
   displayPos.x += uRiverScrollMoveX;
-  
-  if (uRiverWrapWidth > 0.0) {
-  float halfWrapWidth = uRiverWrapWidth * 0.5;
-  displayPos.x = mod(displayPos.x + halfWrapWidth, uRiverWrapWidth) - halfWrapWidth;
-  }
-  
   displayPos.y += uRiverScrollMoveY;
   displayPos.z += uRiverScrollMoveZ;
   
@@ -315,7 +308,6 @@
   uniform float uRiverScrollMoveX;
   uniform float uRiverScrollMoveY;
   uniform float uRiverScrollMoveZ;
-  uniform float uRiverWrapWidth;
   
   uniform float uRiverOffsetY;
   uniform float uRiverOffsetZ;
@@ -352,12 +344,6 @@
   vec3 displayPos = aStartPosition;
   
   displayPos.x += uRiverScrollMoveX;
-  
-  if (uRiverWrapWidth > 0.0) {
-  float halfWrapWidth = uRiverWrapWidth * 0.5;
-  displayPos.x = mod(displayPos.x + halfWrapWidth, uRiverWrapWidth) - halfWrapWidth;
-  }
-  
   displayPos.y += uRiverScrollMoveY;
   displayPos.z += uRiverScrollMoveZ;
   
@@ -512,11 +498,6 @@
     let lastTickTime = null;
 
     let rowCount = 1;
-    let planeWidth = 1;
-    let sectionLocalY = 0;
-    let msStartPx = 0;
-    let msEndPx = 0;
-    let msScrollVh = 0;
 
     function showLogoEnabled() {
       if (!sectionEl) return true;
@@ -677,7 +658,7 @@
       const rows = Math.max(2, Math.floor(CONFIG.PARTICLES_DEEP));
       const spacing = CONFIG.PARTICLE_SPACING;
 
-      planeWidth = (cols - 1) * spacing;
+      const planeWidth = (cols - 1) * spacing;
       const planeHeight = (rows - 1) * spacing;
 
       rowCount = rows;
@@ -887,9 +868,6 @@
           uRiverScrollMoveZ: {
             value: 0
           },
-          uRiverWrapWidth: {
-            value: 0
-          },
           uRowCount: {
             value: rowCount
           },
@@ -1060,9 +1038,6 @@
           uRiverScrollMoveZ: {
             value: 0
           },
-          uRiverWrapWidth: {
-            value: 0
-          },
           uRiverOffsetY: {
             value: 0
           },
@@ -1134,36 +1109,24 @@
 
       const rect = sectionEl.getBoundingClientRect();
       const sectionTop = window.scrollY + rect.top;
-      const sectionHeight = Math.max(
-        sectionEl.offsetHeight,
-        sectionEl.scrollHeight
-      );
+      const sectionHeight = sectionEl.offsetHeight;
 
       const localY =
         typeof progress.shiftedLocalY === "number"
-          ? progress.shiftedLocalY
+          ? progress.shiftedLocalY - window.innerHeight
           : window.scrollY - sectionTop;
 
       const tiPx = window.innerHeight * (TRANSITION.TI / 100);
       const toPx = window.innerHeight * (TRANSITION.TO / 100);
-      const toStartOffsetPx = window.innerHeight * TRANSITION.TO_START_OFFSET;
 
       const msStart = tiPx;
-      const toStart = Math.max(msStart, sectionHeight - toPx - toStartOffsetPx);
-      const msDuration = Math.max(toStart - msStart, 1);
-
-      sectionLocalY = localY;
-      msStartPx = msStart;
-      msEndPx = toStart;
+      const toStartOffsetPx = window.innerHeight * TRANSITION.TO_START_OFFSET;
+      const msEnd = sectionHeight - toStartOffsetPx;
 
       tiProgress = clamp01(localY / Math.max(tiPx, 1));
-      msProgress = clamp01((localY - msStart) / msDuration);
-      toProgress = clamp01((localY - toStart) / Math.max(toPx, 1));
+      toProgress = clamp01((localY - msEnd) / Math.max(toPx, 1));
+      msProgress = clamp01((localY - msStart) / Math.max(msEnd - msStart, 1));
       fullProgress = clamp01(localY / Math.max(sectionHeight, 1));
-
-      const movementPx = Math.max(localY, 0);
-
-      msScrollVh = (movementPx / window.innerHeight) * 100;
     }
 
     function applyTransitionIn() {
@@ -1248,7 +1211,7 @@
 
     function updateWaveOffset() {
       const tiWave = tiProgress * TRANSITION.TI_WAVE_SCROLL_DISTANCE;
-      const mainWave = (msScrollVh / 100) * TRANSITION.WAVE_SCROLL_DISTANCE;
+      const mainWave = fullProgress * TRANSITION.WAVE_SCROLL_DISTANCE;
       const toWave = toProgress * TRANSITION.TO_WAVE_SCROLL_DISTANCE;
 
       scrollWaveOffset = tiWave + mainWave + toWave;
@@ -1263,11 +1226,9 @@
     }
 
     function updateRiverScrollMove() {
-      const mainUnits = msScrollVh / 100;
-
-      const baseMoveX = mainUnits * CONFIG.RIVER_SCROLL_MOVE_X_PER_100VH;
-      const baseMoveY = mainUnits * CONFIG.RIVER_SCROLL_MOVE_Y_PER_100VH;
-      const baseMoveZ = mainUnits * CONFIG.RIVER_SCROLL_MOVE_Z_PER_100VH;
+      const baseMoveX = fullProgress * CONFIG.RIVER_SCROLL_MOVE_X;
+      const baseMoveY = fullProgress * CONFIG.RIVER_SCROLL_MOVE_Y;
+      const baseMoveZ = fullProgress * CONFIG.RIVER_SCROLL_MOVE_Z;
 
       riverScrollMoveX =
         baseMoveX + toProgress * TRANSITION.TO_SCROLL_CONTINUE_X;
@@ -1292,9 +1253,6 @@
         riverMaterial.uniforms.uRiverScrollMoveX.value = riverScrollMoveX;
         riverMaterial.uniforms.uRiverScrollMoveY.value = riverScrollMoveY;
         riverMaterial.uniforms.uRiverScrollMoveZ.value = riverScrollMoveZ;
-        riverMaterial.uniforms.uRiverWrapWidth.value = CONFIG.RIVER_WRAP_ENABLED
-          ? planeWidth + CONFIG.RIVER_WRAP_EXTRA_WIDTH
-          : 0;
         riverMaterial.uniforms.uFrontFadeRows.value = CONFIG.FRONT_FADE_ROWS;
         riverMaterial.uniforms.uBackFadeRows.value = CONFIG.BACK_FADE_ROWS;
         riverMaterial.uniforms.uMinFadeAlpha.value = CONFIG.MIN_FADE_ALPHA;
@@ -1342,9 +1300,6 @@
         liftMaterial.uniforms.uRiverScrollMoveX.value = riverScrollMoveX;
         liftMaterial.uniforms.uRiverScrollMoveY.value = riverScrollMoveY;
         liftMaterial.uniforms.uRiverScrollMoveZ.value = riverScrollMoveZ;
-        liftMaterial.uniforms.uRiverWrapWidth.value = CONFIG.RIVER_WRAP_ENABLED
-          ? planeWidth + CONFIG.RIVER_WRAP_EXTRA_WIDTH
-          : 0;
         liftMaterial.uniforms.uRiverOffsetY.value = riverOffsetY;
         liftMaterial.uniforms.uRiverOffsetZ.value = riverOffsetZ;
         liftMaterial.uniforms.uSvgReveal.value = svgReveal;
