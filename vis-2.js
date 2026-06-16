@@ -1,4 +1,4 @@
-console.log("Vis 2 - THU 16th JUN v2");
+console.log("Vis 2 - THU 16th JUN v3");
 (function startWhenAIMReady() {
   if (!window.AIM) {
     window.addEventListener("aimGlobalReady", startWhenAIMReady, {
@@ -1113,7 +1113,7 @@ console.log("Vis 2 - THU 16th JUN v2");
 
       const localY =
         typeof progress.shiftedLocalY === "number"
-          ? progress.shiftedLocalY - window.innerHeight
+          ? progress.shiftedLocalY
           : window.scrollY - sectionTop;
 
       const tiPx = window.innerHeight * (TRANSITION.TI / 100);
