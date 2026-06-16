@@ -1,4 +1,4 @@
-console.log("Vis 2 - THU 16th JUN");
+console.log("Vis 2 - THU 16th JUN v2");
 (function startWhenAIMReady() {
   if (!window.AIM) {
     window.addEventListener("aimGlobalReady", startWhenAIMReady, {
@@ -29,7 +29,7 @@ console.log("Vis 2 - THU 16th JUN");
 
   // === MAIN SCRIPT ===
 
-  function getSvgViewBoxAspect(svgString) {
+   function getSvgViewBoxAspect(svgString) {
     const match = svgString.match(/viewBox=["']([^"']+)["']/i);
     if (!match) return 1;
 
@@ -1278,7 +1278,7 @@ console.log("Vis 2 - THU 16th JUN");
         riverMaterial.uniforms.uToOpacityBoost.value =
           TRANSITION.TO_OPACITY_BOOST;
 
-        riverPoints.visible = isActive && scrollAlpha > 0.001;
+        riverPoints.visible = isActive;
 
         riverPoints.position.y = toProgress * TRANSITION.TO_OBJECT_MOVE_Y;
         riverPoints.position.z = toProgress * TRANSITION.TO_OBJECT_MOVE_Z;
@@ -1328,7 +1328,6 @@ console.log("Vis 2 - THU 16th JUN");
         liftPoints.visible =
           showLogoEnabled() &&
           isActive &&
-          scrollAlpha > 0.001 &&
           svgReveal > 0.001 &&
           svgLiftProgress < 0.999;
         liftPoints.position.y = toProgress * TRANSITION.TO_OBJECT_MOVE_Y;
