@@ -1,4 +1,4 @@
-console.log("Vis 4 - Wed 17th JUN v2");
+console.log("Vis 4 - Wed 17th JUN v3");
 (function startWhenAIMReady() {
     if (!window.AIM) {
       window.addEventListener('aimGlobalReady', startWhenAIMReady, {
@@ -1419,7 +1419,15 @@ console.log("Vis 4 - Wed 17th JUN v2");
       },
 
        async prewarm(app) {
-      if (!isBuilt || this.__prewarmed) return true;
+          if (!isBuilt) {
+          console.warn('[VIS-4 PREWARM] skipped because not built yet');
+          return false;
+        }
+        
+        if (this.__prewarmed) {
+          console.log('[VIS-4 PREWARM] already done');
+          return true;
+        }
 
       console.log("[VIS-4 PREWARM] start");
 
