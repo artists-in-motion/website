@@ -1,4 +1,4 @@
-console.log("Vis 4 - Wed 17th JUN v3");
+console.log("Vis 4 - Wed 17th JUN v4");
 (function startWhenAIMReady() {
     if (!window.AIM) {
       window.addEventListener('aimGlobalReady', startWhenAIMReady, {
@@ -1418,7 +1418,7 @@ console.log("Vis 4 - Wed 17th JUN v3");
         updateTransitionProgress();
       },
 
-       async prewarm(app) {
+       async prewarm(app, options = {}) {
           if (!isBuilt) {
           console.warn('[VIS-4 PREWARM] skipped because not built yet');
           return false;
@@ -1440,7 +1440,8 @@ console.log("Vis 4 - Wed 17th JUN v3");
       const sectionHeight = sectionEl?.offsetHeight || window.innerHeight * 3;
       const viewportHeight = app.viewport.height || window.innerHeight || 1;
 
-      const ratios = [0.02, 0.08, 0.15, 0.25, 0.4, 0.6, 0.85, 1.0];
+      const ratios = options.ratios || [0.02, 0.08, 0.15, 0.25, 0.4, 0.6, 0.85, 1.0];
+      const framesPerRatio = options.framesPerRatio || 12;
 
       for (const ratio of ratios) {
         const localY = sectionHeight * ratio;
@@ -1455,7 +1456,7 @@ console.log("Vis 4 - Wed 17th JUN v3");
           viewportHeight
         };
 
-        for (let i = 0; i < 12; i++) {
+        for (let i = 0; i < framesPerRatio; i++) {
           updateTransitionProgress(progress);
           updateRotationAndTransform();
           applyTimeline();
