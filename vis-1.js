@@ -362,7 +362,7 @@ color.rgb = clamp(color.rgb, 0.0, 1.0);
 
 function debugLog(...args) {
   if (!CONFIG.DEBUG_CONSOLE) return;
-  console.log(...args);
+  //console.log(...args);
 }
 
 function isFiniteVideoDuration(video) {
@@ -1890,7 +1890,7 @@ const Vis1 = (() => {
       try {
         VIDEO_URLS = window.AIM.getVideoUrls(".video-urls");
 
-        console.log("[Vis1 Video] URLs found:", VIDEO_URLS);
+        //console.log("[Vis1 Video] URLs found:", VIDEO_URLS);
 
         if (!VIDEO_URLS.length) {
           throw new Error("No Vis 1 video URLs configured");
@@ -1902,12 +1902,12 @@ const Vis1 = (() => {
         nextImageIndex =
           VIDEO_URLS.length > 1 ? getNextImageIndex() : currentImageIndex;
 
-        console.log("[Vis1 Video] Current loading:", {
+        //console.log("[Vis1 Video] Current loading:", {
           index: currentImageIndex,
           url: VIDEO_URLS[currentImageIndex]
         });
 
-        console.log("[Vis1 Video] Next preload:", {
+        //console.log("[Vis1 Video] Next preload:", {
           index: nextImageIndex,
           url: VIDEO_URLS[nextImageIndex]
         });
