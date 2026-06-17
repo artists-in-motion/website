@@ -1,4 +1,4 @@
-console.log("Vis 2 - WED 17th JUN v1");
+console.log("Vis 2 - WED 17th JUN v2");
 (function startWhenAIMReady() {
   if (!window.AIM) {
     window.addEventListener("aimGlobalReady", startWhenAIMReady, {
@@ -29,7 +29,7 @@ console.log("Vis 2 - WED 17th JUN v1");
 
   // === MAIN SCRIPT ===
 
-   function getSvgViewBoxAspect(svgString) {
+  function getSvgViewBoxAspect(svgString) {
     const match = svgString.match(/viewBox=["']([^"']+)["']/i);
     if (!match) return 1;
 
@@ -84,7 +84,8 @@ console.log("Vis 2 - WED 17th JUN v1");
   uniform float uToMoveY;
   
   uniform float uSvgReveal;
-  uniform float uSvgLiftProgress;
+  uniform float uSvgLayerProgress;
+uniform float uSvgFloatProgress;
   uniform float uSvgFillerStart;
   uniform float uSvgFillerEnd;
   
@@ -139,17 +140,17 @@ console.log("Vis 2 - WED 17th JUN v1");
   void main() {
   float mask = aSvgMask;
   
-  float localLift = clamp(
-  (uSvgLiftProgress - aSvgLiftDelay) /
-  max(1.0 - aSvgLiftDelay, 0.0001),
-  0.0,
-  1.0
-  );
-  
-  float liftDone = easeOutCubic(localLift);
-  
-  float svgHighlight = mask * uSvgReveal * (1.0 - liftDone);
-  vSvgMask = svgHighlight;
+  float localFloat = clamp(
+(uSvgFloatProgress - aSvgLiftDelay) /
+max(1.0 - aSvgLiftDelay, 0.0001),
+0.0,
+1.0
+);
+
+float floatDone = easeOutCubic(localFloat);
+
+float svgHighlight = 0.0;
+vSvgMask = 0.0;
   
   vec3 displayPos = aStartPosition;
   
@@ -321,7 +322,8 @@ console.log("Vis 2 - WED 17th JUN v1");
   uniform float uRiverOffsetZ;
   
   uniform float uSvgReveal;
-  uniform float uSvgLiftProgress;
+  uniform float uSvgLayerProgress;
+uniform float uSvgFloatProgress;
   uniform float uSvgLiftFadePower;
   uniform float uSvgLayerCount;
   
@@ -340,14 +342,14 @@ console.log("Vis 2 - WED 17th JUN v1");
   }
   
   void main() {
-  float localLift = clamp(
-  (uSvgLiftProgress - aSvgLiftDelay) /
-  max(1.0 - aSvgLiftDelay, 0.0001),
-  0.0,
-  1.0
-  );
-  
-  float liftEase = easeOutCubic(localLift);
+  float localFloat = clamp(
+(uSvgFloatProgress - aSvgLiftDelay) /
+max(1.0 - aSvgLiftDelay, 0.0001),
+0.0,
+1.0
+);
+
+float liftEase = easeOutCubic(localFloat);
   
   vec3 displayPos = aStartPosition;
   
@@ -382,10 +384,13 @@ console.log("Vis 2 - WED 17th JUN v1");
   smoothstep(
   layerRevealStart,
   layerRevealStart + 0.28,
-  uSvgReveal
+  uSvgLayerProgress
   );
   
-  vAlpha = layerReveal * fadeOut;
+  float firstLayer = 1.0 - step(0.5, aSvgLayerIndex);
+float revealAmount = max(firstLayer * uSvgReveal, layerReveal);
+
+vAlpha = revealAmount * fadeOut;
   vSvgUv = vec2(aSvgU, aSvgV);
   vSvgLayerIndex = aSvgLayerIndex;
   
@@ -505,7 +510,8 @@ console.log("Vis 2 - WED 17th JUN v1");
     let waveBoost = 0;
 
     let svgReveal = 0;
-    let svgLiftProgress = 0;
+    let svgLayerProgress = 0;
+    let svgFloatProgress = 0;
 
     let lastFullProgress = 0;
     let scrollDirection = 1;
@@ -536,6 +542,34 @@ console.log("Vis 2 - WED 17th JUN v1");
 
     function getRangeProgress(value, start, end) {
       return clamp01((value - start) / Math.max(end - start, 0.0001));
+    }
+
+    function updateSvgSequenceProgress() {
+      const startVh = CONFIG.SVG_SEQUENCE_START_VH || 0;
+
+      const fadeStart = startVh;
+      const fadeEnd = fadeStart + CONFIG.SVG_FADE_DURATION_VH;
+
+      const layerStart = fadeEnd;
+      const layerEnd = layerStart + CONFIG.SVG_LAYER_DURATION_VH;
+
+      const holdStart = layerEnd;
+      const holdEnd = holdStart + CONFIG.SVG_HOLD_DURATION_VH;
+
+      const floatStart = holdEnd;
+      const floatEnd = floatStart + CONFIG.SVG_FLOAT_DURATION_VH;
+
+      svgReveal = showLogoEnabled()
+        ? getRangeProgress(msScrollVh, fadeStart, fadeEnd)
+        : 0;
+
+      svgLayerProgress = showLogoEnabled()
+        ? getRangeProgress(msScrollVh, layerStart, layerEnd)
+        : 0;
+
+      svgFloatProgress = showLogoEnabled()
+        ? getRangeProgress(msScrollVh, floatStart, floatEnd)
+        : 1;
     }
 
     function randomRange(min, max) {
@@ -920,7 +954,10 @@ console.log("Vis 2 - WED 17th JUN v1");
           uSvgReveal: {
             value: 0
           },
-          uSvgLiftProgress: {
+          uSvgLayerProgress: {
+            value: 0
+          },
+          uSvgFloatProgress: {
             value: 0
           },
           uSvgFillerStart: {
@@ -1072,7 +1109,10 @@ console.log("Vis 2 - WED 17th JUN v1");
           uSvgReveal: {
             value: 0
           },
-          uSvgLiftProgress: {
+          uSvgLayerProgress: {
+            value: 0
+          },
+          uSvgFloatProgress: {
             value: 0
           },
           uSvgLiftFadePower: {
@@ -1179,15 +1219,7 @@ console.log("Vis 2 - WED 17th JUN v1");
       riverOffsetZ = TRANSITION.TI_FROM_Z * (1 - moveT);
       waveBoost = TRANSITION.TI_WAVE_BOOST * (1 - moveT);
 
-      svgReveal = showLogoEnabled()
-        ? getRangeProgress(
-            tiProgress,
-            CONFIG.SVG_REVEAL_START,
-            CONFIG.SVG_REVEAL_END
-          )
-        : 0;
-
-      svgLiftProgress = 0;
+      updateSvgSequenceProgress();
     }
 
     function applyMainScroll() {
@@ -1196,19 +1228,7 @@ console.log("Vis 2 - WED 17th JUN v1");
       riverOffsetY = 0;
       riverOffsetZ = 0;
       waveBoost = 0;
-
-      if (showLogoEnabled()) {
-        svgReveal = 1;
-
-        svgLiftProgress = getRangeProgress(
-          msProgress,
-          CONFIG.SVG_LIFT_START,
-          CONFIG.SVG_LIFT_END
-        );
-      } else {
-        svgReveal = 0;
-        svgLiftProgress = 1;
-      }
+      updateSvgSequenceProgress();
     }
 
     function applyTransitionOut() {
@@ -1219,7 +1239,8 @@ console.log("Vis 2 - WED 17th JUN v1");
       waveBoost = TRANSITION.TO_WAVE_BOOST * toProgress;
 
       svgReveal = 0;
-      svgLiftProgress = 1;
+      svgLayerProgress = 1;
+      svgFloatProgress = 1;
     }
 
     function applyTimeline() {
@@ -1293,7 +1314,7 @@ console.log("Vis 2 - WED 17th JUN v1");
         riverMaterial.uniforms.uRiverScrollMoveY.value = riverScrollMoveY;
         riverMaterial.uniforms.uRiverScrollMoveZ.value = riverScrollMoveZ;
         riverMaterial.uniforms.uRiverWrapWidth.value = CONFIG.RIVER_WRAP_ENABLED
-          ? planeWidth + CONFIG.RIVER_WRAP_EXTRA_WIDTH
+          ? planeWidth + CONFIG.PARTICLE_SPACING
           : 0;
         riverMaterial.uniforms.uFrontFadeRows.value = CONFIG.FRONT_FADE_ROWS;
         riverMaterial.uniforms.uBackFadeRows.value = CONFIG.BACK_FADE_ROWS;
@@ -1304,7 +1325,8 @@ console.log("Vis 2 - WED 17th JUN v1");
         riverMaterial.uniforms.uToDurationMs.value = TRANSITION.TO_DURATION_MS;
         riverMaterial.uniforms.uToMoveY.value = TRANSITION.TO_PARTICLE_LIFT_Y;
         riverMaterial.uniforms.uSvgReveal.value = svgReveal;
-        riverMaterial.uniforms.uSvgLiftProgress.value = svgLiftProgress;
+        riverMaterial.uniforms.uSvgLayerProgress.value = svgLayerProgress;
+        riverMaterial.uniforms.uSvgFloatProgress.value = svgFloatProgress;
         riverMaterial.uniforms.uSvgFillerStart.value = CONFIG.SVG_FILLER_START;
         riverMaterial.uniforms.uSvgFillerEnd.value = CONFIG.SVG_FILLER_END;
         riverMaterial.uniforms.uBackgroundAlphaMultiplier.value =
@@ -1343,12 +1365,13 @@ console.log("Vis 2 - WED 17th JUN v1");
         liftMaterial.uniforms.uRiverScrollMoveY.value = riverScrollMoveY;
         liftMaterial.uniforms.uRiverScrollMoveZ.value = riverScrollMoveZ;
         liftMaterial.uniforms.uRiverWrapWidth.value = CONFIG.RIVER_WRAP_ENABLED
-          ? planeWidth + CONFIG.RIVER_WRAP_EXTRA_WIDTH
+          ? planeWidth + CONFIG.PARTICLE_SPACING
           : 0;
         liftMaterial.uniforms.uRiverOffsetY.value = riverOffsetY;
         liftMaterial.uniforms.uRiverOffsetZ.value = riverOffsetZ;
         liftMaterial.uniforms.uSvgReveal.value = svgReveal;
-        liftMaterial.uniforms.uSvgLiftProgress.value = svgLiftProgress;
+        liftMaterial.uniforms.uSvgLayerProgress.value = svgLayerProgress;
+        liftMaterial.uniforms.uSvgFloatProgress.value = svgFloatProgress;
         liftMaterial.uniforms.uSvgLiftFadePower.value =
           CONFIG.SVG_LIFT_FADE_POWER;
         liftMaterial.uniforms.uSvgColor.value.set(CONFIG.SVG_COLOR);
@@ -1375,7 +1398,7 @@ console.log("Vis 2 - WED 17th JUN v1");
           isActive &&
           scrollAlpha > 0.001 &&
           svgReveal > 0.001 &&
-          svgLiftProgress < 0.999;
+          svgFloatProgress < 0.999;
         liftPoints.position.y = toProgress * TRANSITION.TO_OBJECT_MOVE_Y;
         liftPoints.position.z = toProgress * TRANSITION.TO_OBJECT_MOVE_Z;
         liftPoints.rotation.x =
