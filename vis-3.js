@@ -1,4 +1,4 @@
-console.log("Vis 3 - WED 17th JUN v2");
+console.log("Vis 3 - WED 17th JUN v3");
 (function startWhenAIMReady() {
   if (!window.AIM) {
     window.addEventListener("aimGlobalReady", startWhenAIMReady, {
