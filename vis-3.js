@@ -1344,10 +1344,6 @@ console.log("Vis 3 - WED 17th JUN v2");
               detail: { id: "vis-3" }
             })
           );
-
-        requestAnimationFrame(() => {
-          window.dispatchEvent(new Event("scroll"));
-        });
         } catch (error) {
           console.error("Vis 3 texture load failed:", error);
         }
