@@ -1,4 +1,4 @@
-console.log("Vis 2 - WED 17th JUN v5");
+console.log("Vis 2 - WED 17th JUN v6");
 (function startWhenAIMReady() {
   if (!window.AIM) {
     window.addEventListener("aimGlobalReady", startWhenAIMReady, {
@@ -29,7 +29,7 @@ console.log("Vis 2 - WED 17th JUN v5");
 
   // === MAIN SCRIPT ===
 
-function getSvgViewBoxAspect(svgString) {
+ function getSvgViewBoxAspect(svgString) {
     const match = svgString.match(/viewBox=["']([^"']+)["']/i);
     if (!match) return 1;
 
@@ -1180,8 +1180,8 @@ vAlpha = revealAmount * fadeOut;
       );
 
       const localY =
-        typeof progress.localY === "number"
-          ? progress.localY
+        typeof progress.shiftedLocalY === "number"
+          ? progress.shiftedLocalY
           : window.scrollY - sectionTop;
 
       const tiPx = window.innerHeight * (TRANSITION.TI / 100);
