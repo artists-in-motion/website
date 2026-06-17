@@ -1,4 +1,4 @@
-//console.log("Vis 3 - WED 17th JUN v3");
+console.log("Vis 3 - WED 17th JUN v4");
 (function startWhenAIMReady() {
   if (!window.AIM) {
     window.addEventListener("aimGlobalReady", startWhenAIMReady, {
@@ -1383,6 +1383,74 @@
         updateTransitionProgress();
       },
 
+      async prewarm(app, options = {}) {
+  if (!isBuilt) {
+    console.warn('[VIS-3 PREWARM] skipped because not built yet');
+    return false;
+  }
+
+  if (this.__prewarmed) {
+    console.log('[VIS-3 PREWARM] already done');
+    return true;
+  }
+
+  console.log('[VIS-3 PREWARM] start');
+
+  const wasActive = isActive;
+  const wasVisible = masterGroup.visible;
+
+  isActive = true;
+  masterGroup.visible = true;
+
+  const ratios = options.ratios || [0.08, 0.25, 0.5, 0.85];
+  const framesPerRatio = options.framesPerRatio || 6;
+
+  const sectionHeight =
+    sectionEl?.offsetHeight || window.innerHeight * 3;
+
+  const viewportHeight =
+    app.viewport?.height || window.innerHeight;
+
+  for (const ratio of ratios) {
+    const localY = sectionHeight * ratio;
+
+    const progress = {
+      sectionProgress: ratio,
+      enterProgress: 1,
+      exitProgress: 0,
+      localY,
+      shiftedLocalY: localY,
+      sectionHeight,
+      viewportHeight
+    };
+
+    for (let i = 0; i < framesPerRatio; i++) {
+      updateTransitionProgress(progress);
+      applyTimeline();
+      updateRotationAndTransform();
+
+      app.renderer.compile(app.scene, app.camera);
+      app.renderer.render(app.scene, app.camera);
+
+      await new Promise(requestAnimationFrame);
+    }
+  }
+
+  masterGroup.visible = wasVisible;
+  isActive = wasActive;
+
+  this.__prewarmed = true;
+
+  console.log('[VIS-3 PREWARM] done', {
+    calls: app.renderer.info.render.calls,
+    textures: app.renderer.info.memory.textures,
+    geometries: app.renderer.info.memory.geometries,
+    programs: app.renderer.info.programs?.length
+  });
+
+  return true;
+},
+      
       destroy() {
         window.removeEventListener("pointermove", onPointerMove);
 
