@@ -1,4 +1,4 @@
-console.log("Vis 4 - Wed 17th JUN");
+console.log("Vis 4 - Wed 17th JUN v2");
 (function startWhenAIMReady() {
     if (!window.AIM) {
       window.addEventListener('aimGlobalReady', startWhenAIMReady, {
@@ -1418,54 +1418,61 @@ console.log("Vis 4 - Wed 17th JUN");
         updateTransitionProgress();
       },
 
-        async prewarm(app) {
-  if (!isBuilt || this.__prewarmed) return true;
+       async prewarm(app) {
+      if (!isBuilt || this.__prewarmed) return true;
 
-  console.log('[VIS-4 PREWARM] start');
+      console.log("[VIS-4 PREWARM] start");
 
-  const wasActive = isActive;
-  const wasVisible = masterGroup.visible;
+      const wasActive = isActive;
+      const wasVisible = masterGroup.visible;
 
-  isActive = true;
-  masterGroup.visible = true;
+      isActive = true;
+      masterGroup.visible = true;
 
-  const sectionHeight = sectionEl?.offsetHeight || window.innerHeight * 3;
-  const viewportHeight = app.viewport.height || window.innerHeight || 1;
-  const localY = sectionHeight * 0.5;
+      const sectionHeight = sectionEl?.offsetHeight || window.innerHeight * 3;
+      const viewportHeight = app.viewport.height || window.innerHeight || 1;
 
-  const progress = {
-    sectionProgress: 0.5,
-    enterProgress: 1,
-    exitProgress: 0,
-    localY,
-    shiftedLocalY: localY,
-    sectionHeight,
-    viewportHeight,
-  };
+      const ratios = [0.02, 0.08, 0.15, 0.25, 0.4, 0.6, 0.85, 1.0];
 
-  applyCurrentStateAfterLoad(progress);
+      for (const ratio of ratios) {
+        const localY = sectionHeight * ratio;
 
-  for (let i = 0; i < 8; i++) {
-    tick(app, progress);
-    app.renderer.compile(app.scene, app.camera);
-    app.renderer.render(app.scene, app.camera);
-    await new Promise(requestAnimationFrame);
-  }
+        const progress = {
+          sectionProgress: ratio,
+          enterProgress: 1,
+          exitProgress: 0,
+          localY,
+          shiftedLocalY: localY,
+          sectionHeight,
+          viewportHeight
+        };
 
-  masterGroup.visible = wasVisible;
-  isActive = wasActive;
+        for (let i = 0; i < 12; i++) {
+          updateTransitionProgress(progress);
+          updateRotationAndTransform();
+          applyTimeline();
 
-  this.__prewarmed = true;
+          app.renderer.compile(app.scene, app.camera);
+          app.renderer.render(app.scene, app.camera);
 
-  console.log('[VIS-4 PREWARM] done', {
-    calls: app.renderer.info.render.calls,
-    textures: app.renderer.info.memory.textures,
-    geometries: app.renderer.info.memory.geometries,
-    programs: app.renderer.info.programs?.length,
-  });
+          await new Promise(requestAnimationFrame);
+        }
+      }
 
-  return true;
-},
+      masterGroup.visible = wasVisible;
+      isActive = wasActive;
+
+      this.__prewarmed = true;
+
+      console.log("[VIS-4 PREWARM] done", {
+        calls: app.renderer.info.render.calls,
+        textures: app.renderer.info.memory.textures,
+        geometries: app.renderer.info.memory.geometries,
+        programs: app.renderer.info.programs?.length
+      });
+
+      return true;
+    },
 
       destroy() {
         window.removeEventListener('pointermove', onPointerMove);
