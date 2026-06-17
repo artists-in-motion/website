@@ -1,4 +1,4 @@
-//console.log("Vis 3 - THU 12th JUN");
+console.log("Vis 3 - WED 17th JUN");
 (function startWhenAIMReady() {
   if (!window.AIM) {
     window.addEventListener("aimGlobalReady", startWhenAIMReady, {
@@ -1336,13 +1336,18 @@
 
           isBuilt = true;
           applyCurrentStateAfterLoad();
-
+          
           window.AIM_VIS3_READY = true;
-
+          
           window.dispatchEvent(
             new CustomEvent("aimVisualReady", {
               detail: { id: "vis-3" }
             })
+          );
+
+requestAnimationFrame(() => {
+  window.dispatchEvent(new Event("scroll"));
+});
           );
         } catch (error) {
           console.error("Vis 3 texture load failed:", error);
