@@ -1,4 +1,4 @@
-console.log("Vis 2 - WED 17th JUN v3");
+console.log("Vis 2 - WED 17th JUN v4");
 (function startWhenAIMReady() {
   if (!window.AIM) {
     window.addEventListener("aimGlobalReady", startWhenAIMReady, {
@@ -1189,7 +1189,7 @@ vAlpha = revealAmount * fadeOut;
       const toStartOffsetPx = window.innerHeight * TRANSITION.TO_START_OFFSET;
 
       const msStart = tiPx;
-      const toStart = Math.max(msStart, sectionHeight - toPx - toStartOffsetPx);
+      const toStart = Math.max(msStart,sectionHeight + window.innerHeight - toPx - toStartOffsetPx);
       const msDuration = Math.max(toStart - msStart, 1);
 
       sectionLocalY = localY;
