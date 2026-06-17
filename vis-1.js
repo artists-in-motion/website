@@ -1902,15 +1902,17 @@ const Vis1 = (() => {
         nextImageIndex =
           VIDEO_URLS.length > 1 ? getNextImageIndex() : currentImageIndex;
 
-        //console.log("[Vis1 Video] Current loading:", {
+        /*
+        console.log("[Vis1 Video] Current loading:", {
           index: currentImageIndex,
           url: VIDEO_URLS[currentImageIndex]
         });
 
-        //console.log("[Vis1 Video] Next preload:", {
+        console.log("[Vis1 Video] Next preload:", {
           index: nextImageIndex,
           url: VIDEO_URLS[nextImageIndex]
         });
+        */
 
         await loadVideoTexture(currentImageIndex);
         await preloadNextVideo();
