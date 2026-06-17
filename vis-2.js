@@ -1,4 +1,4 @@
-console.log("Vis 2 - WED 17th JUN v2");
+console.log("Vis 2 - WED 17th JUN v3");
 (function startWhenAIMReady() {
   if (!window.AIM) {
     window.addEventListener("aimGlobalReady", startWhenAIMReady, {
@@ -29,7 +29,7 @@ console.log("Vis 2 - WED 17th JUN v2");
 
   // === MAIN SCRIPT ===
 
-  function getSvgViewBoxAspect(svgString) {
+ function getSvgViewBoxAspect(svgString) {
     const match = svgString.match(/viewBox=["']([^"']+)["']/i);
     if (!match) return 1;
 
@@ -110,11 +110,11 @@ uniform float uSvgFloatProgress;
   return 1.0 - pow(1.0 - t, 3.0);
   }
   
-  float getWave(float offset) {
-  float waveA = sin(aStartPosition.x * uWaveFrequencyX + offset);
-  float waveB = sin(aStartPosition.y * uWaveFrequencyY + offset * 0.7);
+ float getWave(vec3 pos, float offset) {
+  float waveA = sin(pos.x * uWaveFrequencyX + offset);
+  float waveB = sin(pos.y * uWaveFrequencyY + offset * 0.7);
   return (waveA + waveB) * 0.5;
-  }
+}
   
   float getFrontFadeAlpha(float rowIndex, float fadeRows, float minAlpha) {
   if (fadeRows <= 0.0) return 1.0;
@@ -167,8 +167,8 @@ vSvgMask = 0.0;
   displayPos.y += uRiverOffsetY;
   displayPos.z += uBaseZOffset + uRiverOffsetZ;
   
-  float scrollOnlyWave = getWave(uScrollWaveOffset);
-  float autoWave = getWave(uScrollWaveOffset + uAutoWaveOffset);
+  float scrollOnlyWave = getWave(displayPos, uScrollWaveOffset);
+float autoWave = getWave(displayPos, uScrollWaveOffset + uAutoWaveOffset);
   float blendedWave = mix(scrollOnlyWave, autoWave, uAutoWaveBlend);
   
   displayPos.z += blendedWave * uWaveAmplitude;
@@ -335,11 +335,11 @@ uniform float uSvgFloatProgress;
   return 1.0 - pow(1.0 - t, 3.0);
   }
   
-  float getWave(float offset) {
-  float waveA = sin(aStartPosition.x * uWaveFrequencyX + offset);
-  float waveB = sin(aStartPosition.y * uWaveFrequencyY + offset * 0.7);
+  float getWave(vec3 pos, float offset) {
+  float waveA = sin(pos.x * uWaveFrequencyX + offset);
+  float waveB = sin(pos.y * uWaveFrequencyY + offset * 0.7);
   return (waveA + waveB) * 0.5;
-  }
+}
   
   void main() {
   float localFloat = clamp(
@@ -366,8 +366,8 @@ float liftEase = easeOutCubic(localFloat);
   displayPos.y += uRiverOffsetY;
   displayPos.z += uBaseZOffset + uRiverOffsetZ;
   
-  float scrollOnlyWave = getWave(uScrollWaveOffset);
-  float autoWave = getWave(uScrollWaveOffset + uAutoWaveOffset);
+  float scrollOnlyWave = getWave(displayPos, uScrollWaveOffset);
+float autoWave = getWave(displayPos, uScrollWaveOffset + uAutoWaveOffset);
   float blendedWave = mix(scrollOnlyWave, autoWave, uAutoWaveBlend);
   
   displayPos.z += blendedWave * uWaveAmplitude;
