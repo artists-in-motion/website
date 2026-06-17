@@ -1,4 +1,4 @@
-//console.log("Vis 4 - THU 12th JUN");
+console.log("Vis 4 - Wed 17th JUN");
 (function startWhenAIMReady() {
     if (!window.AIM) {
       window.addEventListener('aimGlobalReady', startWhenAIMReady, {
@@ -1417,6 +1417,55 @@
       resize() {
         updateTransitionProgress();
       },
+
+        async prewarm(app) {
+  if (!isBuilt || this.__prewarmed) return true;
+
+  console.log('[VIS-4 PREWARM] start');
+
+  const wasActive = isActive;
+  const wasVisible = masterGroup.visible;
+
+  isActive = true;
+  masterGroup.visible = true;
+
+  const sectionHeight = sectionEl?.offsetHeight || window.innerHeight * 3;
+  const viewportHeight = app.viewport.height || window.innerHeight || 1;
+  const localY = sectionHeight * 0.5;
+
+  const progress = {
+    sectionProgress: 0.5,
+    enterProgress: 1,
+    exitProgress: 0,
+    localY,
+    shiftedLocalY: localY,
+    sectionHeight,
+    viewportHeight,
+  };
+
+  applyCurrentStateAfterLoad(progress);
+
+  for (let i = 0; i < 8; i++) {
+    tick(app, progress);
+    app.renderer.compile(app.scene, app.camera);
+    app.renderer.render(app.scene, app.camera);
+    await new Promise(requestAnimationFrame);
+  }
+
+  masterGroup.visible = wasVisible;
+  isActive = wasActive;
+
+  this.__prewarmed = true;
+
+  console.log('[VIS-4 PREWARM] done', {
+    calls: app.renderer.info.render.calls,
+    textures: app.renderer.info.memory.textures,
+    geometries: app.renderer.info.memory.geometries,
+    programs: app.renderer.info.programs?.length,
+  });
+
+  return true;
+},
 
       destroy() {
         window.removeEventListener('pointermove', onPointerMove);
