@@ -1,4 +1,4 @@
-console.log("Vis 2 - WED 17th JUN v4");
+console.log("Vis 2 - WED 17th JUN v5");
 (function startWhenAIMReady() {
   if (!window.AIM) {
     window.addEventListener("aimGlobalReady", startWhenAIMReady, {
@@ -29,7 +29,7 @@ console.log("Vis 2 - WED 17th JUN v4");
 
   // === MAIN SCRIPT ===
 
- function getSvgViewBoxAspect(svgString) {
+function getSvgViewBoxAspect(svgString) {
     const match = svgString.match(/viewBox=["']([^"']+)["']/i);
     if (!match) return 1;
 
@@ -1180,25 +1180,20 @@ vAlpha = revealAmount * fadeOut;
       );
 
       const localY =
-        typeof progress.shiftedLocalY === "number"
-          ? progress.shiftedLocalY
+        typeof progress.localY === "number"
+          ? progress.localY
           : window.scrollY - sectionTop;
 
       const tiPx = window.innerHeight * (TRANSITION.TI / 100);
       const toPx = window.innerHeight * (TRANSITION.TO / 100);
-      const toStartOffsetPx = window.innerHeight * TRANSITION.TO_START_OFFSET;
 
       const msStart = tiPx;
-      const toStart = Math.max(msStart,sectionHeight + window.innerHeight - toPx - toStartOffsetPx);
-      const msDuration = Math.max(toStart - msStart, 1);
-
-      sectionLocalY = localY;
-      msStartPx = msStart;
-      msEndPx = toStart;
+      const toStartOffsetPx = window.innerHeight * TRANSITION.TO_START_OFFSET;
+      const toStart = sectionHeight - toStartOffsetPx;
 
       tiProgress = clamp01(localY / Math.max(tiPx, 1));
-      msProgress = clamp01((localY - msStart) / msDuration);
       toProgress = clamp01((localY - toStart) / Math.max(toPx, 1));
+      msProgress = clamp01((localY - msStart) / Math.max(toStart - msStart, 1));
       fullProgress = clamp01(localY / Math.max(sectionHeight, 1));
 
       const movementPx = Math.max(localY, 0);
