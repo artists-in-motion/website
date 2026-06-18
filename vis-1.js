@@ -1,4 +1,4 @@
-console.log("Vis 1 - Thu 18th JUN");
+console.log("Vis 1 - Thu 18th JUN v2");
 (function startWhenAIMReady() {
     if (!window.AIM) {
       window.addEventListener('aimGlobalReady', startWhenAIMReady, {
@@ -810,11 +810,6 @@ const Vis1 = (() => {
       })
     );
   }
-
-    window.addEventListener("aimRequestIntroPulse", () => {
-      if ((window.scrollY || 0) > 200) return;
-    restartPulse();
-    });
 
   function updatePulse(nowMs) {
     if (!CONFIG.MS_PULSE_ENABLED || pulseStartMs < 0) {
