@@ -1,4 +1,4 @@
-console.log("Vis 1 - Thu 18th JUN v2");
+console.log("Vis 1 - Thu 18th JUN v3");
 (function startWhenAIMReady() {
     if (!window.AIM) {
       window.addEventListener('aimGlobalReady', startWhenAIMReady, {
@@ -852,8 +852,6 @@ const Vis1 = (() => {
     topReturnArmed = false;
     lastTopReturnMs = nowMs;
 
-    restartPulse();
-
     imageCyclePaused = false;
 
     resetToDisplayPhase();
@@ -1406,8 +1404,6 @@ const Vis1 = (() => {
 
     setState("transitionIn");
     setPhaseUniforms(2.0, 0.0, CONFIG.TRANSITION_IN_DURATION_MS);
-
-    restartPulse();
   }
 
   function updatePointerState(nowMs) {
@@ -2049,6 +2045,8 @@ const Vis1 = (() => {
     }
   };
 })();
+
+window.AIMVis1 = {pulse: restartPulse};
 
 window.AIM.register("vis-1", Vis1);
 })();
