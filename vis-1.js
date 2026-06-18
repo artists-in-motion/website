@@ -1,4 +1,4 @@
-console.log("Vis 1 - Thu 18th JUN v3");
+console.log("Vis 1 - Thu 18th JUN v4");
 (function startWhenAIMReady() {
     if (!window.AIM) {
       window.addEventListener('aimGlobalReady', startWhenAIMReady, {
@@ -2038,15 +2038,19 @@ const Vis1 = (() => {
       if (hasStoredPointerPosition()) {
         updateRawPointerTargets(lastPointerClientX, lastPointerClientY);
       }
-
+    
       if (texturesLoaded && isActive) {
         buildParticles(textures[currentImageIndex]);
       }
+    },
+    
+    pulse() {
+      restartPulse();
     }
   };
 })();
 
-window.AIMVis1 = {pulse: restartPulse};
+window.AIMVis1 = Vis1;
 
 window.AIM.register("vis-1", Vis1);
 })();
