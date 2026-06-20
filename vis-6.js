@@ -1,4 +1,4 @@
-console.log("Vis 6 - SAT 20th JUN v3");
+console.log("Vis 6 - SAT 20th JUN v4");
 (function startWhenAIMReady() {
   if (!window.AIM) {
     window.addEventListener("aimGlobalReady", startWhenAIMReady, {
@@ -1414,12 +1414,13 @@ console.log("Vis 6 - SAT 20th JUN v3");
         disposeGrid();
       },
 
-      resize(app, progress = {}) {
-        if (isActive) {
-          disposeGrid();
-          buildGrid();
-          applyCurrentState(app?.scroll?.progressById?.["vis-6"] || progress);
-        }
+     resize(app, progress = {}) {
+        if (!isActive) return;
+      
+        const currentProgress =
+          app?.scroll?.progressById?.["vis-6"] || progress;
+      
+        applyCurrentState(currentProgress);
       }
     };
   })();
