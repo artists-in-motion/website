@@ -19,7 +19,7 @@
   // Example window.AIM.getImageUrls('.urls', 6); / will fetch 6 images
   const IMAGE_URLS = window.AIM.getImageUrls(".image-urls");
 
-  const CONFIG = {
+  let CONFIG = {
     // =========================================================
     // VISUAL POSITION / SCALE
     // =========================================================
@@ -112,6 +112,8 @@
     ROUGHNESS: 0.72, // 0 = glossy, 1 = matte.
     METALNESS: 0.06 // Surface metalness.
   };
+
+  CONFIG = app.getVisualConfig?.('vis-3', CONFIG) || CONFIG;
 
   const TRANSITION = {
     // =========================================================
