@@ -1,4 +1,4 @@
-console.log("Vis 7 - SAT 20th JUN v1");
+//console.log("Vis 7 - SAT 20th JUN v1");
 
         const app = window.AIM;
         const THREE = app.THREE;
