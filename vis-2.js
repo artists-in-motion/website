@@ -918,9 +918,6 @@ vAlpha = revealAmount * fadeOut;
           uBaseYOffset: {
             value: CONFIG.BASE_Y_OFFSET
           },
-          uBaseYOffset: {
-            value: CONFIG.BASE_Y_OFFSET
-          },
           uBaseZOffset: {
             value: CONFIG.BASE_Z_OFFSET
           },
@@ -1096,6 +1093,9 @@ vAlpha = revealAmount * fadeOut;
           },
           uWaveFrequencyY: {
             value: CONFIG.WAVE_FREQUENCY_Y
+          },
+          uBaseYOffset: {
+            value: CONFIG.BASE_Y_OFFSET
           },
           uBaseZOffset: {
             value: CONFIG.BASE_Z_OFFSET
