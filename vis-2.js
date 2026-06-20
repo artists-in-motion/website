@@ -24,8 +24,10 @@
 
   // === CONFIG PULLED FROM WEBFLOW WEBFLOW ===
 
-  const CONFIG = window.AIM_VIS2_CONFIG || {};
+  let CONFIG = window.AIM_VIS2_CONFIG || {};
   const TRANSITION = window.AIM_VIS2_TRANSITION || {};
+
+  CONFIG = app.getVisualConfig?.('vis-2', CONFIG) || CONFIG;
 
   // === MAIN SCRIPT ===
 
