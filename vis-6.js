@@ -1208,7 +1208,6 @@ console.log("Vis 6 - SAT 20th JUN v3");
     }
 
     function applyTimeline() {
-      const vh = window.AIM?.getViewportHeight?.() || window.innerHeight || 1;
 
       const scrollIndex = localY / Math.max(lastViewportHeight, 1);
 
