@@ -19,7 +19,7 @@
   // Example window.AIM.getImageUrls('.urls', 6); / will fetch 6 images
   const IMAGE_URLS = window.AIM.getImageUrls('.image-urls');
 
-  const CONFIG = {
+  let CONFIG = {
     // === POSITION / SCALE ===
     VISUAL_SCALE: 0.25, // Overall scale of the entire globe system.
 
@@ -116,6 +116,8 @@
     METALNESS: 0.06, // Surface metalness.
   };
 
+  CONFIG = app.getVisualConfig?.('vis-4', CONFIG) || CONFIG;
+    
   const TRANSITION = {
     TI: 100,
     TO: 100,
