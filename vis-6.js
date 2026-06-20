@@ -1,4 +1,5 @@
 console.log("Vis 6 - SAT 20th JUN v4");
+alert("Vis 6 - SAT 20th JUN v4");
 (function startWhenAIMReady() {
   if (!window.AIM) {
     window.addEventListener("aimGlobalReady", startWhenAIMReady, {
