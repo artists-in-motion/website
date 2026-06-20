@@ -67,6 +67,7 @@
   uniform float uWaveFrequencyX;
   uniform float uWaveFrequencyY;
   uniform float uBaseZOffset;
+  uniform float uBaseYOffset;
   
   uniform float uRiverScrollMoveX;
   uniform float uRiverScrollMoveY;
@@ -167,6 +168,7 @@ vSvgMask = 0.0;
   displayPos.z += uRiverScrollMoveZ;
   
   displayPos.y += uRiverOffsetY;
+  displayPos.y += uBaseYOffset;
   displayPos.z += uBaseZOffset + uRiverOffsetZ;
   
   float scrollOnlyWave = getWave(displayPos, uScrollWaveOffset);
@@ -314,6 +316,7 @@ float autoWave = getWave(displayPos, uScrollWaveOffset + uAutoWaveOffset);
   uniform float uWaveFrequencyX;
   uniform float uWaveFrequencyY;
   uniform float uBaseZOffset;
+  uniform float uBaseYOffset;
   
   uniform float uRiverScrollMoveX;
   uniform float uRiverScrollMoveY;
@@ -366,6 +369,7 @@ float liftEase = easeOutCubic(localFloat);
   displayPos.z += uRiverScrollMoveZ;
   
   displayPos.y += uRiverOffsetY;
+  displayPos.y += uBaseYOffset;
   displayPos.z += uBaseZOffset + uRiverOffsetZ;
   
   float scrollOnlyWave = getWave(displayPos, uScrollWaveOffset);
@@ -911,6 +915,12 @@ vAlpha = revealAmount * fadeOut;
           uWaveFrequencyY: {
             value: CONFIG.WAVE_FREQUENCY_Y
           },
+          uBaseYOffset: {
+            value: CONFIG.BASE_Y_OFFSET
+          },
+          uBaseYOffset: {
+            value: CONFIG.BASE_Y_OFFSET
+          },
           uBaseZOffset: {
             value: CONFIG.BASE_Z_OFFSET
           },
@@ -1314,6 +1324,7 @@ vAlpha = revealAmount * fadeOut;
         riverMaterial.uniforms.uWaveFrequencyX.value = CONFIG.WAVE_FREQUENCY_X;
         riverMaterial.uniforms.uWaveFrequencyY.value = CONFIG.WAVE_FREQUENCY_Y;
         riverMaterial.uniforms.uBaseZOffset.value = CONFIG.BASE_Z_OFFSET;
+        riverMaterial.uniforms.uBaseYOffset.value = CONFIG.BASE_Y_OFFSET;
         riverMaterial.uniforms.uRiverScrollMoveX.value = riverScrollMoveX;
         riverMaterial.uniforms.uRiverScrollMoveY.value = riverScrollMoveY;
         riverMaterial.uniforms.uRiverScrollMoveZ.value = riverScrollMoveZ;
@@ -1365,6 +1376,7 @@ vAlpha = revealAmount * fadeOut;
         liftMaterial.uniforms.uWaveFrequencyX.value = CONFIG.WAVE_FREQUENCY_X;
         liftMaterial.uniforms.uWaveFrequencyY.value = CONFIG.WAVE_FREQUENCY_Y;
         liftMaterial.uniforms.uBaseZOffset.value = CONFIG.BASE_Z_OFFSET;
+        liftMaterial.uniforms.uBaseYOffset.value = CONFIG.BASE_Y_OFFSET;
         liftMaterial.uniforms.uRiverScrollMoveX.value = riverScrollMoveX;
         liftMaterial.uniforms.uRiverScrollMoveY.value = riverScrollMoveY;
         liftMaterial.uniforms.uRiverScrollMoveZ.value = riverScrollMoveZ;
