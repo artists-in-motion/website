@@ -1388,7 +1388,7 @@ console.log("Vis 3 - SAT 20th JUN v1");
         window.removeEventListener("pointermove", onPointerMove);
       },
 
-      resize() {
+      resize(app, progress = {}) {
         updateTransitionProgress(app?.scroll?.progressById?.["vis-3"] || progress);
       },
 
