@@ -1,4 +1,4 @@
-//console.log("Vis 2 - WED 17th JUN v6");
+console.log("Vis 2 - SAT 20th JUN v1");
 (function startWhenAIMReady() {
   if (!window.AIM) {
     window.addEventListener("aimGlobalReady", startWhenAIMReady, {
@@ -1169,36 +1169,43 @@ vAlpha = revealAmount * fadeOut;
 
     function updateTransitionProgress(progress = {}) {
       sectionEl = sectionEl || document.getElementById("vis-2");
-
+    
       if (!sectionEl) return;
-
-      const rect = sectionEl.getBoundingClientRect();
-      const sectionTop = window.scrollY + rect.top;
+    
       const sectionHeight = Math.max(
         sectionEl.offsetHeight,
-        sectionEl.scrollHeight
+        sectionEl.scrollHeight,
+        1
       );
-
+    
+      const viewportHeight =
+        progress.viewportHeight ||
+        window.AIM?.getViewportHeight?.() ||
+        window.innerHeight ||
+        1;
+    
       const localY =
         typeof progress.shiftedLocalY === "number"
           ? progress.shiftedLocalY
-          : window.scrollY - sectionTop;
-
-      const tiPx = window.innerHeight * (TRANSITION.TI / 100);
-      const toPx = window.innerHeight * (TRANSITION.TO / 100);
-
+          : typeof progress.localY === "number"
+            ? progress.localY
+            : 0;
+    
+      const tiPx = viewportHeight * (TRANSITION.TI / 100);
+      const toPx = viewportHeight * (TRANSITION.TO / 100);
+    
       const msStart = tiPx;
-      const toStartOffsetPx = window.innerHeight * TRANSITION.TO_START_OFFSET;
+      const toStartOffsetPx = viewportHeight * TRANSITION.TO_START_OFFSET;
       const toStart = sectionHeight - toStartOffsetPx;
-
+    
       tiProgress = clamp01(localY / Math.max(tiPx, 1));
       toProgress = clamp01((localY - toStart) / Math.max(toPx, 1));
       msProgress = clamp01((localY - msStart) / Math.max(toStart - msStart, 1));
       fullProgress = clamp01(localY / Math.max(sectionHeight, 1));
-
+    
       const movementPx = Math.max(localY, 0);
-
-      msScrollVh = (movementPx / window.innerHeight) * 100;
+    
+      msScrollVh = (movementPx / viewportHeight) * 100;
     }
 
     function applyTransitionIn() {
