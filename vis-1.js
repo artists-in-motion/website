@@ -1,4 +1,4 @@
-console.log("Vis 1 - Sat 20th JUN v1");
+console.log("Vis 1 - Sat 20th JUN v2");
 (function startWhenAIMReady() {
     if (!window.AIM) {
       window.addEventListener('aimGlobalReady', startWhenAIMReady, {
@@ -1981,7 +1981,7 @@ const Vis1 = (() => {
           : 0;
     
     const totalScrollable = Math.max(sectionHeight - viewportH, 1);
-    const travelled = clamp01(localY / totalScrollable);
+    const travelled = clamp01((localY - viewportH) / totalScrollable);
 
       scrollMainProgress = travelled;
       msStarfieldProgress = getMsStarfieldEffect(scrollMainProgress);
