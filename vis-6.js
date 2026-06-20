@@ -1323,7 +1323,6 @@ return {
             buildGrid();
             applyCurrentState(app?.scroll?.progressById?.['vis-6'] || progress);
           }
-        }
         },
       };
     })();
