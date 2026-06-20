@@ -13,7 +13,7 @@
   const scene = app.scene;
   const container = app.container || document.body;
 
-  const CONFIG = {
+  let CONFIG = {
     // === IMAGE INPUTS ===
     IMAGE_URLS: [
       "https://cdn.prod.website-files.com/69dec44200d5fa5789162235/6a0d470f53bef97415fa643c_services-cc-3.jpg",
@@ -136,6 +136,8 @@
     TI_START_SCALE: 0.9, // Starting scale during TI.
     TI_EASE_POWER: 1.4 // TI easing strength.
   };
+
+  CONFIG = app.getVisualConfig?.('vis-6', CONFIG) || CONFIG;
 
   const TRANSITION = {
     TI: 100,
