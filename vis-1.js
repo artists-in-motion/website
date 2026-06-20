@@ -28,8 +28,10 @@ const MOUSE_SHAPE_SVG = `
 
 // === CONFIG PULLED FROM WEBFLOW WEBFLOW ===
 
-const CONFIG = window.AIM_VIS1_CONFIG || {};
+let CONFIG = window.AIM_VIS1_CONFIG || {};
 const TRANSITION = window.AIM_VIS1_TRANSITION || {};
+
+CONFIG = app.getVisualConfig?.('vis-1', CONFIG) || CONFIG;
     
 // === MAIN SCRIPT ===
 
