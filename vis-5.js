@@ -19,7 +19,7 @@ const scene = app.scene;
 // Example window.AIM.getImageUrls('.urls', 6); / will fetch 6 images
 const IMAGE_URLS = window.AIM.getImageUrls(".image-urls");
 
-const CONFIG = {
+let CONFIG = {
   // === MASTER POSITION / SCALE ===
   VISUAL_SCALE: 0.25, // Scales entire visual. Try 0.1 to 0.5.
   CUBE_POSITION_X: 3.5, // Moves full scene left/right.
@@ -121,6 +121,8 @@ const CONFIG = {
   ROUGHNESS: 0.72, // Material roughness.
   METALNESS: 0.06 // Material metalness.
 };
+
+CONFIG = app.getVisualConfig?.('vis-5', CONFIG) || CONFIG;
 
 const TRANSITION = {
   // === TRANSITION LENGTHS ===
