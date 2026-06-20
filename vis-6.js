@@ -1,4 +1,4 @@
-//console.log("Vis 6 - THU 12th JUN");
+console.log("Vis 6 - SAT 20th JUN v1");
 (function startWhenAIMReady() {
     if (!window.AIM) {
       window.addEventListener('aimGlobalReady', startWhenAIMReady, {
@@ -1101,29 +1101,40 @@ window.dispatchEvent(
 }
 
 function updateTransitionProgress(progress = {}) {
-        sectionEl = sectionEl || document.getElementById('vis-6');
+  sectionEl = sectionEl || document.getElementById('vis-6');
 
-        if (!sectionEl) return;
+  if (!sectionEl) return;
 
-        const rect = sectionEl.getBoundingClientRect();
+  const sectionHeight =
+    progress.sectionHeight ||
+    sectionEl.offsetHeight ||
+    1;
 
-        const sectionTop = window.scrollY + rect.top;
+  const viewportHeight =
+    progress.viewportHeight ||
+    window.AIM?.getViewportHeight?.() ||
+    window.innerHeight ||
+    1;
 
-        const sectionHeight = sectionEl.offsetHeight;
+  localY =
+    typeof progress.shiftedLocalY === 'number'
+      ? progress.shiftedLocalY
+      : typeof progress.localY === 'number'
+        ? progress.localY
+        : 0;
 
-        localY = typeof progress.shiftedLocalY === 'number' ? progress.shiftedLocalY : window.scrollY - sectionTop;
+  const tiPx = viewportHeight * (TRANSITION.TI / 100);
+  const toPx = viewportHeight * (TRANSITION.TO / 100);
 
-        const tiPx = window.innerHeight * (TRANSITION.TI / 100);
-
-        const toPx = window.innerHeight * (TRANSITION.TO / 100);
-
-        tiProgress = clamp01(localY / Math.max(tiPx, 1));
-
-        toProgress = clamp01((localY - sectionHeight) / Math.max(toPx, 1));
-      }
+  tiProgress = clamp01(localY / Math.max(tiPx, 1));
+  toProgress = clamp01((localY - sectionHeight) / Math.max(toPx, 1));
+}
 
       function applyTimeline() {
-        const vh = Math.max(window.innerHeight, 1);
+        const vh =
+          window.AIM?.getViewportHeight?.() ||
+          window.innerHeight ||
+          1;
 
         const scrollIndex = localY / vh;
 
@@ -1306,12 +1317,13 @@ return {
           disposeGrid();
         },
 
-        resize() {
+       resize(app, progress = {}) {
           if (isActive) {
             disposeGrid();
             buildGrid();
-            applyCurrentState();
+            applyCurrentState(app?.scroll?.progressById?.['vis-6'] || progress);
           }
+        }
         },
       };
     })();
