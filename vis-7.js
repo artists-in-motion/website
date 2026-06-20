@@ -4,7 +4,7 @@
         const THREE = app.THREE;
         const scene = app.scene;
   
-        const CONFIG = {
+        let CONFIG = {
           // ==========================================================
           // SHAPE
           // ==========================================================
@@ -135,6 +135,8 @@
   
           MOUSE_EASE: 0.01, // Mouse smoothing, lower = slower ease out.
         };
+
+        CONFIG = app.getVisualConfig?.('vis-7', CONFIG) || CONFIG;
   
         const SVG_STRING = `
   <svg width="174" height="61" viewBox="0 0 174 61" fill="none" xmlns="http://www.w3.org/2000/svg">
