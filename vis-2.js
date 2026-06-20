@@ -1492,7 +1492,7 @@ vAlpha = revealAmount * fadeOut;
         }
       },
 
-      resize() {
+      resize(app, progress = {}) {
         if (isActive) {
           buildParticles();
           applyCurrentState(app?.scroll?.progressById?.["vis-2"] || progress);
