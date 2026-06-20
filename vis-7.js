@@ -1,4 +1,4 @@
-//console.log("Vis 7 - THU 12th JUN");
+console.log("Vis 7 - SAT 20th JUN v1");
 
         const app = window.AIM;
         const THREE = app.THREE;
@@ -542,16 +542,28 @@
             isBuilding = false;
           }
   
-          function updateTransitionProgress(progress = {}) {
-            sectionEl = sectionEl || document.getElementById('vis-7');
-  
-            if (!sectionEl) return;
-  
-            const localY = typeof progress.shiftedLocalY === 'number' ? progress.shiftedLocalY : 0;
-            const tiPx = window.innerHeight * (CONFIG.TI_VH / 100);
-  
-            tiProgress = clamp01(localY / Math.max(tiPx, 1));
-          }
+         function updateTransitionProgress(progress = {}) {
+          sectionEl = sectionEl || document.getElementById('vis-7');
+        
+          if (!sectionEl) return;
+        
+          const viewportHeight =
+            progress.viewportHeight ||
+            window.AIM?.getViewportHeight?.() ||
+            window.innerHeight ||
+            1;
+        
+          const localY =
+            typeof progress.shiftedLocalY === 'number'
+              ? progress.shiftedLocalY
+              : typeof progress.localY === 'number'
+                ? progress.localY
+                : 0;
+        
+          const tiPx = viewportHeight * (CONFIG.TI_VH / 100);
+        
+          tiProgress = clamp01(localY / Math.max(tiPx, 1));
+        }
   
           function updateMouseOffset() {
             targetMouseOffset.x = mouse.x * CONFIG.MOUSE_INFLUENCE_X;
