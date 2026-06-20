@@ -1,4 +1,4 @@
-//console.log("Vis 5 - WED 17th JUN v1");
+console.log("Vis 5 - SAT 20th JUN v1");
 (function startWhenAIMReady() {
   if (!window.AIM) {
     window.addEventListener("aimGlobalReady", startWhenAIMReady, {
@@ -1222,29 +1222,38 @@ const Vis5 = (() => {
   }
 
   function updateTransitionProgress(progress = {}) {
-    sectionEl = sectionEl || document.getElementById("vis-5");
-    if (!sectionEl) return;
+  sectionEl = sectionEl || document.getElementById("vis-5");
+  if (!sectionEl) return;
 
-    const rect = sectionEl.getBoundingClientRect();
-    const sectionTop = window.scrollY + rect.top;
-    const sectionHeight = sectionEl.offsetHeight;
+  const sectionHeight =
+    progress.sectionHeight ||
+    sectionEl.offsetHeight ||
+    1;
 
-    const localY =
-      typeof progress.shiftedLocalY === "number"
-        ? progress.shiftedLocalY
-        : window.scrollY - sectionTop;
+  const viewportHeight =
+    progress.viewportHeight ||
+    window.AIM?.getViewportHeight?.() ||
+    window.innerHeight ||
+    1;
 
-    const tiPx = window.innerHeight * (TRANSITION.TI / 100);
-    const toPx = window.innerHeight * (TRANSITION.TO / 100);
+  const localY =
+    typeof progress.shiftedLocalY === "number"
+      ? progress.shiftedLocalY
+      : typeof progress.localY === "number"
+        ? progress.localY
+        : 0;
 
-    const msStart = tiPx;
-    const msEnd = sectionHeight;
+  const tiPx = viewportHeight * (TRANSITION.TI / 100);
+  const toPx = viewportHeight * (TRANSITION.TO / 100);
 
-    tiProgress = clamp01(localY / Math.max(tiPx, 1));
-    toProgress = clamp01((localY - msEnd) / Math.max(toPx, 1));
-    msProgress = clamp01((localY - msStart) / Math.max(msEnd - msStart, 1));
-    fullProgress = clamp01(localY / Math.max(sectionHeight, 1));
-  }
+  const msStart = tiPx;
+  const msEnd = sectionHeight;
+
+  tiProgress = clamp01(localY / Math.max(tiPx, 1));
+  toProgress = clamp01((localY - msEnd) / Math.max(toPx, 1));
+  msProgress = clamp01((localY - msStart) / Math.max(msEnd - msStart, 1));
+  fullProgress = clamp01(localY / Math.max(sectionHeight, 1));
+}
 
   function updateFloatingCubesAtField(globalOpacity) {
     floatingData.forEach((cube, i) => {
@@ -1612,9 +1621,9 @@ const Vis5 = (() => {
       window.removeEventListener("pointermove", onPointerMove);
     },
 
-    resize() {
-      updateTransitionProgress();
-    },
+    resize(app, progress = {}) {
+  updateTransitionProgress(app?.scroll?.progressById?.["vis-5"] || progress);
+  },
 
     async prewarm(app, options = {}) {
   if (!isBuilt) {
@@ -1638,8 +1647,14 @@ const Vis5 = (() => {
   const ratios = options.ratios || [0.08, 0.25, 0.5, 0.85];
   const framesPerRatio = options.framesPerRatio || 6;
 
-  const sectionHeight = sectionEl?.offsetHeight || window.innerHeight * 3;
-  const viewportHeight = app.viewport?.height || window.innerHeight;
+  const viewportHeight =
+  app.getViewportHeight?.() ||
+  app.viewport?.height ||
+  window.innerHeight ||
+  1;
+
+const sectionHeight =
+  sectionEl?.offsetHeight || viewportHeight * 3;
 
   for (const ratio of ratios) {
     const localY = sectionHeight * ratio;
