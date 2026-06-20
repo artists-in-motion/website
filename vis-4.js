@@ -1426,7 +1426,7 @@ console.log("Vis 4 - SAT 20th JUN v1");
         window.removeEventListener('pointermove', onPointerMove);
       },
 
-      resize() {
+      resize(app, progress = {}) {
         updateTransitionProgress(app?.scroll?.progressById?.['vis-4'] || progress);
       },
 
