@@ -1,4 +1,4 @@
-//console.log("Vis 6 - SAT 20th JUN v5");
+console.log("Vis 6 - TUE 23rd JUN v1");
 (function startWhenAIMReady() {
   if (!window.AIM) {
     window.addEventListener("aimGlobalReady", startWhenAIMReady, {
@@ -1363,10 +1363,12 @@
     }
 
     function onPointerMove(e) {
+      
+      if (e.pointerType && e.pointerType !== 'mouse') return;
+      
       const rect = container.getBoundingClientRect();
 
       mouseX = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-
       mouseY = ((e.clientY - rect.top) / rect.height) * 2 - 1;
     }
 
