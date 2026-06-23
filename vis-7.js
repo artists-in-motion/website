@@ -125,8 +125,6 @@ console.log("Vis 7 - TUE 23rd JUN v3");
           // TI
           // ==========================================================
   
-          TI_VH: 100, // TI scroll range in vh.
-  
           TI_SCENE_START_Y: -1.0, // Starting scene Y offset.
 
           TI_START_PROGRESS: 0.0, // 0 = starts when vis-7 enters.
