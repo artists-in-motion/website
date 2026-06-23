@@ -1,4 +1,4 @@
-console.log("Vis 7 - TUE 23rd JUN v2");
+console.log("Vis 7 - TUE 23rd JUN v3");
 
         const app = window.AIM;
         const THREE = app.THREE;
@@ -128,6 +128,9 @@ console.log("Vis 7 - TUE 23rd JUN v2");
           TI_VH: 100, // TI scroll range in vh.
   
           TI_SCENE_START_Y: -1.0, // Starting scene Y offset.
+
+          TI_START_PROGRESS: 0.0, // 0 = starts when vis-7 enters.
+          TI_END_PROGRESS: 1.0, // 1 = finishes at end of vis-7 section.
   
           TI_SCENE_START_ROT_X: 0.0, // Starting scene X rotation.
           TI_SCENE_START_ROT_Y: 0.0, // Starting scene Y rotation.
@@ -545,26 +548,28 @@ console.log("Vis 7 - TUE 23rd JUN v2");
           }
   
          function updateTransitionProgress(progress = {}) {
-          sectionEl = sectionEl || document.getElementById('vis-7');
+          sectionEl = sectionEl || document.getElementById("vis-7");
         
           if (!sectionEl) return;
         
-          const viewportHeight =
-            progress.viewportHeight ||
-            window.AIM?.getViewportHeight?.() ||
-            window.innerHeight ||
-            1;
-        
           const localY =
-            typeof progress.shiftedLocalY === 'number'
+            typeof progress.shiftedLocalY === "number"
               ? progress.shiftedLocalY
-              : typeof progress.localY === 'number'
+              : typeof progress.localY === "number"
                 ? progress.localY
                 : 0;
         
-          const tiPx = viewportHeight * (CONFIG.TI_VH / 100);
+          const sectionHeight =
+            progress.sectionHeight ||
+            sectionEl.offsetHeight ||
+            1;
         
-          tiProgress = clamp01(localY / Math.max(tiPx, 1));
+          const startPx = sectionHeight * CONFIG.TI_START_PROGRESS;
+          const endPx = sectionHeight * CONFIG.TI_END_PROGRESS;
+        
+          tiProgress = clamp01(
+            (localY - startPx) / Math.max(endPx - startPx, 1)
+          );
         }
   
           function updateMouseOffset() {
