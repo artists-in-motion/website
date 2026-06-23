@@ -1673,7 +1673,9 @@ const Vis1 = (() => {
   }
 
   function onPointerMove(e) {
-    registerRealPointer(e.clientX, e.clientY);
+      if (e.pointerType === 'touch') return;
+    
+      registerRealPointer(e.clientX, e.clientY);
   }
 
   function addListeners() {
