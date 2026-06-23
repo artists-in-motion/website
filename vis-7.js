@@ -1,4 +1,4 @@
-//console.log("Vis 7 - SAT 20th JUN v1");
+console.log("Vis 7 - TUE 23rd JUN v1");
 
         const app = window.AIM;
         const THREE = app.THREE;
@@ -956,6 +956,8 @@
           }
   
           window.addEventListener('pointermove', (e) => {
+            if (e.pointerType && e.pointerType !== 'mouse') return;
+        
             mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
             mouse.y = (e.clientY / window.innerHeight) * 2 - 1;
           });
