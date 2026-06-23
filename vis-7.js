@@ -1,4 +1,4 @@
-console.log("Vis 7 - TUE 23rd JUN v1");
+console.log("Vis 7 - TUE 23rd JUN v2");
 
         const app = window.AIM;
         const THREE = app.THREE;
@@ -26,6 +26,14 @@ console.log("Vis 7 - TUE 23rd JUN v1");
           // ==========================================================
           // SVG
           // ==========================================================
+
+          SVG_STRING:`
+          <svg width="174" height="61" viewBox="0 0 174 61" fill="none" xmlns="http://www.w3.org/2000/svg">
+             <path d="M94.64 0.0302734H79.52V60.2603H94.64V0.0302734Z" fill="currentColor"/>
+             <path d="M32.12 0L0 60.28H15.12L32.12 29.69L49.11 60.28H64.24L32.12 0Z" fill="currentColor"/>
+             <path d="M141.89 30.14L109.77 0V19.27L141.89 49.41L174 19.27V0L141.89 30.14Z" fill="currentColor"/>
+          </svg>
+          `,
   
           SVG_SCALE: 0.003, // Overall SVG scale.
           SVG_GRID_JITTER: 0.0, // Randomises SVG particle placement.
@@ -137,14 +145,6 @@ console.log("Vis 7 - TUE 23rd JUN v1");
         };
 
         CONFIG = app.getVisualConfig?.('vis-7', CONFIG) || CONFIG;
-  
-        const SVG_STRING = `
-  <svg width="174" height="61" viewBox="0 0 174 61" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <path d="M94.64 0.0302734H79.52V60.2603H94.64V0.0302734Z" fill="currentColor"/>
-  <path d="M32.12 0L0 60.28H15.12L32.12 29.69L49.11 60.28H64.24L32.12 0Z" fill="currentColor"/>
-  <path d="M141.89 30.14L109.77 0V19.27L141.89 49.41L174 19.27V0L141.89 30.14Z" fill="currentColor"/>
-  </svg>
-  `;
   
         const Vis7 = (() => {
           let sectionEl = null;
@@ -669,7 +669,7 @@ console.log("Vis 7 - TUE 23rd JUN v1");
           async function createShapePositions(shapeName, count) {
             if (shapeName === 'cube') return createFallbackShapeData(createCubePositions(count));
             if (shapeName === 'torus') return createFallbackShapeData(createTorusPositions(count));
-            if (shapeName === 'svg') return await createFlatSVGPositions(SVG_STRING, count);
+            if (shapeName === 'svg') return await createFlatSVGPositions(CONFIG.SVG_STRING, count);
   
             return createFallbackShapeData(createSpherePositions(count));
           }
