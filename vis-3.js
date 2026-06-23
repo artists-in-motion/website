@@ -1,4 +1,4 @@
-console.log("Vis 3 - TUE 23rd JUN v1");
+console.log("Vis 3 - TUE 23rd JUN v2");
 (function startWhenAIMReady() {
   if (!window.AIM) {
     window.addEventListener("aimGlobalReady", startWhenAIMReady, {
@@ -29,6 +29,10 @@ console.log("Vis 3 - TUE 23rd JUN v1");
     CUBE_POSITION_X: 1.5, // Cube pivot left/right. Try -3 to 3.
     CUBE_POSITION_Y: 0.0, // Cube pivot up/down. Try -2 to 2.
     CUBE_POSITION_Z: 0.0, // Cube pivot forward/back. Try -2 to 2.
+
+    CUBE_START_OFFSET_X: 0.0, // Extra X offset at start of TI.
+    CUBE_START_OFFSET_Y: -1.0, // Extra Y offset at start of TI. Negative = starts lower.
+    CUBE_START_OFFSET_Z: 0.0, // Extra Z offset at start of TI.
 
     // =========================================================
     // RUBIK CUBE
@@ -1296,6 +1300,16 @@ console.log("Vis 3 - TUE 23rd JUN v1");
 
       masterGroup.scale.setScalar(CONFIG.VISUAL_SCALE);
       masterGroup.position.z = 0;
+
+      const startOffsetT = easeOutCubic(tiProgress);
+      const startOffsetInv = 1 - startOffsetT;
+      
+      pivotGroup.position.set(
+        CONFIG.CUBE_POSITION_X + CONFIG.CUBE_START_OFFSET_X * startOffsetInv,
+        CONFIG.CUBE_POSITION_Y + CONFIG.CUBE_START_OFFSET_Y * startOffsetInv,
+        CONFIG.CUBE_POSITION_Z + CONFIG.CUBE_START_OFFSET_Z * startOffsetInv
+      );
+      
     }
 
     function onPointerMove(e) {
