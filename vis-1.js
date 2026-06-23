@@ -1673,7 +1673,7 @@ const Vis1 = (() => {
   }
 
   function onPointerMove(e) {
-      if (e.pointerType === 'touch') return;
+      if (e.pointerType && e.pointerType !== 'mouse') return;
     
       registerRealPointer(e.clientX, e.clientY);
   }
