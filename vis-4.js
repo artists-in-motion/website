@@ -1,4 +1,4 @@
-//console.log("Vis 4 - SAT 20th JUN v1");
+console.log("Vis 4 - MON 23rd JUN v1");
 (function startWhenAIMReady() {
     if (!window.AIM) {
       window.addEventListener('aimGlobalReady', startWhenAIMReady, {
@@ -1342,6 +1342,9 @@
     }
 
     function onPointerMove(e) {
+
+      if (e.pointerType && e.pointerType !== 'mouse') return;
+      
       const rect = container.getBoundingClientRect();
 
       mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
