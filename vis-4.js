@@ -1,4 +1,4 @@
-console.log("Vis 4 - WED 5th AUG v4");
+console.log("Vis 4 - WED 5th AUG v5");
 (function startWhenAIMReady() {
     if (!window.AIM) {
       window.addEventListener('aimGlobalReady', startWhenAIMReady, {
@@ -123,6 +123,10 @@ const TRANSITION = {
   TI: 100, // Transition In length.
   TO: 100, // Transition Out length.
 
+  // === TI MOUSE ===
+  TI_MOUSE_START: 100, // No mouse influence during TI.
+  TI_MOUSE_END: 100, // Mouse becomes active at the start of MS.
+
   // === TI FADE ===
   TI_CUBE_FADE_START: 0, // Globe fade starts.
   TI_CUBE_FADE_END: 100, // Globe fully visible.
@@ -145,8 +149,8 @@ const TRANSITION = {
   TI_GLOBE_RISE_Z_VARIANCE: 0.8,
 
   // Bottom of globe starts first.
-  TI_GLOBE_VERTICAL_STAGGER: 0.32,
-  TI_GLOBE_RANDOM_STAGGER: 0.06,
+  TI_GLOBE_VERTICAL_STAGGER: 0.18, // Less delay from bottom to top.
+  TI_GLOBE_RANDOM_STAGGER: 0.04, // Less random delay.
 
   // Random rotation before settling.
   TI_GLOBE_START_ROT_VARIANCE: 1.2,
@@ -341,22 +345,19 @@ const Vis4 = (() => {
     return builtPosition.clone().addScaledVector(normal, clampedOffset);
   }
 
-function makeStartQuaternion(builtQuaternion) {
-  const randomRotation = new THREE.Euler(
-    (Math.random() - 0.5) *
-      TRANSITION.TI_GLOBE_START_ROT_VARIANCE,
+  function makeStartQuaternion(builtQuaternion) {
+    const randomRotation = new THREE.Euler(
+      (Math.random() - 0.5) * TRANSITION.TI_GLOBE_START_ROT_VARIANCE,
 
-    (Math.random() - 0.5) *
-      TRANSITION.TI_GLOBE_START_ROT_VARIANCE,
+      (Math.random() - 0.5) * TRANSITION.TI_GLOBE_START_ROT_VARIANCE,
 
-    (Math.random() - 0.5) *
-      TRANSITION.TI_GLOBE_START_ROT_VARIANCE
-  );
+      (Math.random() - 0.5) * TRANSITION.TI_GLOBE_START_ROT_VARIANCE
+    );
 
-  const q = new THREE.Quaternion().setFromEuler(randomRotation);
+    const q = new THREE.Quaternion().setFromEuler(randomRotation);
 
-  return builtQuaternion.clone().multiply(q);
-}
+    return builtQuaternion.clone().multiply(q);
+  }
 
   function makeGlobeTiming(settledPosition) {
     const verticalRange = CONFIG.GLOBE_RADIUS + CONFIG.GLOBE_TILE_OFFSET_MAX;
@@ -1362,52 +1363,39 @@ function makeStartQuaternion(builtQuaternion) {
     floatGroup.add(floatingInstancedMesh);
   }
 
-function updateTransitionProgress(progress = {}) {
-  sectionEl = sectionEl || document.getElementById("vis-4");
-  if (!sectionEl) return;
+  function updateTransitionProgress(progress = {}) {
+    sectionEl = sectionEl || document.getElementById("vis-4");
+    if (!sectionEl) return;
 
-  const sectionHeight =
-    progress.sectionHeight ||
-    sectionEl.offsetHeight ||
-    1;
+    const sectionHeight = progress.sectionHeight || sectionEl.offsetHeight || 1;
 
-  const viewportHeight =
-    progress.viewportHeight ||
-    window.AIM?.getViewportHeight?.() ||
-    window.innerHeight ||
-    1;
+    const viewportHeight =
+      progress.viewportHeight ||
+      window.AIM?.getViewportHeight?.() ||
+      window.innerHeight ||
+      1;
 
-  const localY =
-    typeof progress.shiftedLocalY === "number"
-      ? progress.shiftedLocalY
-      : typeof progress.localY === "number"
+    const localY =
+      typeof progress.shiftedLocalY === "number"
+        ? progress.shiftedLocalY
+        : typeof progress.localY === "number"
         ? progress.localY
         : 0;
 
-  const tiPx = viewportHeight * (TRANSITION.TI / 100);
-  const toPx = viewportHeight * (TRANSITION.TO / 100);
+    const tiPx = viewportHeight * (TRANSITION.TI / 100);
+    const toPx = viewportHeight * (TRANSITION.TO / 100);
 
-  const msStart = tiPx;
-  const msEnd = sectionHeight;
+    const msStart = tiPx;
+    const msEnd = sectionHeight;
 
-  tiProgress = clamp01(
-    localY / Math.max(tiPx, 1)
-  );
+    tiProgress = clamp01(localY / Math.max(tiPx, 1));
 
-  msProgress = clamp01(
-    (localY - msStart) /
-    Math.max(msEnd - msStart, 1)
-  );
+    msProgress = clamp01((localY - msStart) / Math.max(msEnd - msStart, 1));
 
-  toProgress = clamp01(
-    (localY - msEnd) /
-    Math.max(toPx, 1)
-  );
+    toProgress = clamp01((localY - msEnd) / Math.max(toPx, 1));
 
-  fullProgress = clamp01(
-    localY / Math.max(sectionHeight, 1)
-  );
-}
+    fullProgress = clamp01(localY / Math.max(sectionHeight, 1));
+  }
 
   function updateFloatingCubesAtField(globalOpacity) {
     floatingData.forEach((cube, i) => {
@@ -1463,7 +1451,7 @@ function updateTransitionProgress(progress = {}) {
         cubelet.userData.pullDuration
       );
 
-      const t = easeInOutCubic(Math.pow(delayed, TRANSITION.TI_EASE_POWER));
+      const t = easeOutCubic(Math.pow(delayed, TRANSITION.TI_EASE_POWER));
 
       cubelet.position.lerpVectors(
         cubelet.userData.startPosition,
@@ -1574,14 +1562,24 @@ function updateTransitionProgress(progress = {}) {
   }
 
   function updateRotationAndTransform() {
-    smoothMouse.x += (mouse.x - smoothMouse.x) * 0.1;
-    smoothMouse.y += (mouse.y - smoothMouse.y) * 0.1;
+    if (tiProgress < 1) {
+      smoothMouse.x = 0;
+      smoothMouse.y = 0;
+    } else {
+      smoothMouse.x += (mouse.x - smoothMouse.x) * 0.1;
+      smoothMouse.y += (mouse.y - smoothMouse.y) * 0.1;
+    }
 
-    const flatten = Math.min(1, toProgress * TRANSITION.TO_MOUSE_REDUCTION);
+    const toMouseReduction = Math.min(
+      1,
+      toProgress * TRANSITION.TO_MOUSE_REDUCTION
+    );
 
-    const mouseX = -smoothMouse.y * CONFIG.MOUSE_ROT_X * (1 - flatten);
-    const mouseY = smoothMouse.x * CONFIG.MOUSE_ROT_Y * (1 - flatten);
-    const mouseZ = smoothMouse.x * CONFIG.MOUSE_ROT_Z * (1 - flatten);
+    const mouseStrength = tiProgress < 1 ? 0 : 1 - toMouseReduction;
+
+    const mouseX = -smoothMouse.y * CONFIG.MOUSE_ROT_X * mouseStrength;
+    const mouseY = smoothMouse.x * CONFIG.MOUSE_ROT_Y * mouseStrength;
+    const mouseZ = smoothMouse.x * CONFIG.MOUSE_ROT_Z * mouseStrength;
 
     const scrollRotProgress = mapRange(
       fullProgress,
@@ -1685,24 +1683,16 @@ function updateTransitionProgress(progress = {}) {
       scene.add(light1, light2);
 
       try {
-          await loadTextures();
-        
-          buildCubelets();
-          buildFloatingCubes();
-        
-          isBuilt = true;
-          applyCurrentStateAfterLoad();
-        
-          window.AIM_VIS4_READY = true;
-        
-          window.dispatchEvent(
-            new CustomEvent("aimVisualReady", {
-              detail: { id: "vis-4" }
-            })
-          );
-        } catch (error) {
-          console.error("Vis 4 globe texture load failed:", error);
-        }
+        await loadTextures();
+
+        buildCubelets();
+        buildFloatingCubes();
+
+        isBuilt = true;
+        applyCurrentStateAfterLoad();
+      } catch (error) {
+        console.error("Vis 4 globe texture load failed:", error);
+      }
     },
 
     enter(app, progress = {}) {
@@ -1735,11 +1725,11 @@ function updateTransitionProgress(progress = {}) {
       window.removeEventListener("pointermove", onPointerMove);
     },
 
-resize(app, progress = {}) {
-  updateTransitionProgress(
-    app?.scroll?.progressById?.["vis-4"] || progress
-  );
-},
+    resize(app, progress = {}) {
+      updateTransitionProgress(
+        app?.scroll?.progressById?.["vis-4"] || progress
+      );
+    },
 
     async prewarm(app) {
       if (!isBuilt || this.__prewarmed) return true;
