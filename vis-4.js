@@ -149,8 +149,8 @@ const TRANSITION = {
   TI_GLOBE_RISE_Z_VARIANCE: 0.8,
 
   // Bottom of globe starts first.
-  TI_GLOBE_VERTICAL_STAGGER: 0.18, // Less delay from bottom to top.
-  TI_GLOBE_RANDOM_STAGGER: 0.04, // Less random delay.
+  TI_GLOBE_VERTICAL_STAGGER: 0.25, // Less delay from bottom to top.
+  TI_GLOBE_RANDOM_STAGGER: 0.045, // Less random delay.
 
   // Random rotation before settling.
   TI_GLOBE_START_ROT_VARIANCE: 1.2,
