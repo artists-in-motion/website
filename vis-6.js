@@ -1,4 +1,4 @@
-console.log("Vis 6 - TUE 23rd JUN v1");
+console.log("Vis 6 - WED 5th AUG v1");
 (function startWhenAIMReady() {
   if (!window.AIM) {
     window.addEventListener("aimGlobalReady", startWhenAIMReady, {
@@ -16,17 +16,13 @@ console.log("Vis 6 - TUE 23rd JUN v1");
   let CONFIG = {
     // === IMAGE INPUTS ===
     IMAGE_URLS: [
-      "https://cdn.prod.website-files.com/69dec44200d5fa5789162235/6a0d470f53bef97415fa643c_services-cc-3.jpg",
-      "https://cdn.prod.website-files.com/69dec44200d5fa5789162235/6a0d470fd60de97eda0e4745_services-sd-3.jpg",
-      "https://cdn.prod.website-files.com/69dec44200d5fa5789162235/69fc3e4104a446665141c025_b315331a6b60a373ff3c62fd52e9a1d7_services-cp-2.jpg",
-      "https://cdn.prod.website-files.com/69dec44200d5fa5789162235/6a0d470fe2d021788d4be3d5_services-os-1.jpg",
-      "https://cdn.prod.website-files.com/69dec44200d5fa5789162235/6a0d47109ae48de106727be4_services-sdir-4.jpg",
-      "https://cdn.prod.website-files.com/69dec44200d5fa5789162235/6a0fd6678918163860cfe524_services-pm-2.jpg"
+      "https://cdn.prod.website-files.com/69dec44200d5fa5789162235/6a727887fd363b2bf04f3bfd_scroll-image-1.jpg",
+      "https://cdn.prod.website-files.com/69dec44200d5fa5789162235/6a72788712c97b0fb39320aa_scroll-image-2.jpg",
+      "https://cdn.prod.website-files.com/69dec44200d5fa5789162235/6a7278879d9c303609a3c6a1_scroll-image-3.jpg",
+      "https://cdn.prod.website-files.com/69dec44200d5fa5789162235/6a727887fd363b2bf04f3beb_scroll-image-4.jpg"
     ],
 
     // === IMAGE FRAME / MOSAIC ===
-    FRAME_RATIO_X: 16, // Image frame aspect width.
-    FRAME_RATIO_Y: 10, // Image frame aspect height.
     MOSAIC_COLS: 30, // Number of image tile columns. Higher = more detail, heavier.
     ALPHA_CUTOFF: 0.01, // Removes transparent / near-transparent tiles.
     PLANE_MAX_WIDTH: 1.5, // Image plane width. Height auto-fits from aspect.
@@ -34,10 +30,9 @@ console.log("Vis 6 - TUE 23rd JUN v1");
 
     // === IMAGE GRID LAYOUT ===
     GRID_COLS: 1, // Number of image columns.
-    GRID_ROWS: 6, // Number of image rows.
     GRID_GAP_X: 0.2, // Horizontal gap between images.
     GRID_GAP_Y: 0.2, // Vertical gap between images.
-    SECTION_COUNT: 6, // Number of images to use from IMAGE_URLS.
+    SECTION_COUNT: 0, // Number of images to use from IMAGE_URLS.
 
     // === BASE POSITION / ROTATION ===
     BASE_POS_X: 0.4, // Whole visual X position.
@@ -48,8 +43,6 @@ console.log("Vis 6 - TUE 23rd JUN v1");
     BASE_ROT_Z: -0.15, // Whole visual Z rotation.
 
     // === SCROLL IMAGE TIMELINE ===
-    FIRST_IMAGE_CENTER_VH: 100, // Scroll point where first image is centred.
-    IMAGE_STEP_VH: 100, // Scroll distance between each image centre.
     COLUMN_Y_OFFSET: 0.0, // Extra vertical offset for the image column.
 
     // === IMAGE COLOUR ===
@@ -365,11 +358,13 @@ console.log("Vis 6 - TUE 23rd JUN v1");
 
     let localY = 0;
     let tiProgress = 0;
+    let msProgress = 0;
     let toProgress = 0;
     let columnOffsetY = 0;
     let lastViewportHeight = 1;
 
     let firstImageBaseY = 0;
+    let lastImageBaseY = 0;
     let imageStepY = 1;
     let columnTotalHeight = 1;
     let columnMaxWidth = 1;
@@ -438,110 +433,67 @@ console.log("Vis 6 - TUE 23rd JUN v1");
       );
     }
 
-    function getFrameAspect() {
-      return CONFIG.FRAME_RATIO_X / CONFIG.FRAME_RATIO_Y;
-    }
-
-    function getMosaicDimensions() {
+   function getMosaicDimensions(image) {
       const cols = Math.max(1, Math.floor(CONFIG.MOSAIC_COLS));
-
-      const rows = Math.max(1, Math.round(cols / getFrameAspect()));
-
+    
+      const aspect = image.width / image.height;
+    
+      const rows = Math.max(
+        1,
+        Math.round(cols / aspect)
+      );
+    
       return {
         cols,
         rows
       };
     }
 
-    function getFrameSize() {
-      const frameAspect = getFrameAspect();
-
+    function getImageSize(image) {
+      const aspect = image.width / image.height;
+    
       return {
         width: CONFIG.PLANE_MAX_WIDTH,
-        height: CONFIG.PLANE_MAX_WIDTH / frameAspect
+        height: CONFIG.PLANE_MAX_WIDTH / aspect
       };
     }
 
-    function sampleAlphaMaskForFrame(image, cols, rows) {
+  function sampleAlphaMask(image, cols, rows) {
       const canvas = document.createElement("canvas");
-
+    
       canvas.width = cols;
       canvas.height = rows;
-
+    
       const ctx = canvas.getContext("2d", {
         willReadFrequently: true
       });
-
+    
       ctx.clearRect(0, 0, cols, rows);
-
-      const imageAspect = image.width / image.height;
-
-      const frameAspect = cols / rows;
-
-      let drawWidth;
-      let drawHeight;
-      let drawX;
-      let drawY;
-
-      if (imageAspect > frameAspect) {
-        drawHeight = rows;
-        drawWidth = rows * imageAspect;
-        drawX = (cols - drawWidth) * 0.5;
-        drawY = 0;
-      } else {
-        drawWidth = cols;
-        drawHeight = cols / imageAspect;
-        drawX = 0;
-        drawY = (rows - drawHeight) * 0.5;
-      }
-
-      ctx.drawImage(image, drawX, drawY, drawWidth, drawHeight);
-
+    
+      ctx.drawImage(
+        image,
+        0,
+        0,
+        cols,
+        rows
+      );
+    
       return ctx.getImageData(0, 0, cols, rows).data;
     }
 
-    function getCoverUvTransform(imageWidth, imageHeight, frameAspect) {
-      const imageAspect = imageWidth / imageHeight;
-
-      let scaleX = 1.0;
-      let scaleY = 1.0;
-      let offsetX = 0.0;
-      let offsetY = 0.0;
-
-      if (imageAspect > frameAspect) {
-        scaleX = frameAspect / imageAspect;
-
-        offsetX = (1.0 - scaleX) * 0.5;
-      } else {
-        scaleY = imageAspect / frameAspect;
-
-        offsetY = (1.0 - scaleY) * 0.5;
-      }
-
-      return {
-        scaleX,
-        scaleY,
-        offsetX,
-        offsetY
-      };
-    }
-
     function createTiledImagePlane(texture) {
+
       const image = texture.image;
 
-      const { cols, rows } = getMosaicDimensions();
-
-      const frameSize = getFrameSize();
-
-      const frameAspect = frameSize.width / frameSize.height;
-
-      const alphaData = sampleAlphaMaskForFrame(image, cols, rows);
-
-      const coverUv = getCoverUvTransform(
-        image.width,
-        image.height,
-        frameAspect
-      );
+      const { cols, rows } = getMosaicDimensions(image);
+      
+      const frameSize = getImageSize(image);
+      
+      const alphaData = sampleAlphaMask(
+        image,
+        cols,
+        rows
+    );
 
       const tileWidth = frameSize.width / cols;
 
@@ -600,13 +552,13 @@ console.log("Vis 6 - TUE 23rd JUN v1");
           rowProgresses.push(rowProgress);
           buildYOffsets.push(buildYOffset);
 
-          const u0 = coverUv.offsetX + (x / cols) * coverUv.scaleX;
+          const u0 = x / cols;
 
-          const v0 = coverUv.offsetY + (1.0 - (y + 1) / rows) * coverUv.scaleY;
-
-          const us = coverUv.scaleX / cols;
-
-          const vs = coverUv.scaleY / rows;
+          const v0 = 1.0 - (y + 1) / rows;
+          
+          const us = 1.0 / cols;
+          
+          const vs = 1.0 / rows;
 
           uvOffsets.push(u0, v0);
           uvScales.push(us, vs);
@@ -1024,50 +976,51 @@ console.log("Vis 6 - TUE 23rd JUN v1");
 
     function layoutColumn() {
       if (!columnGroup || !imagePlanes.length) return;
-
-      const cols = Math.max(1, Math.floor(CONFIG.GRID_COLS));
-
-      const rows =
-        CONFIG.GRID_ROWS > 0
-          ? Math.max(1, Math.floor(CONFIG.GRID_ROWS))
-          : Math.ceil(imagePlanes.length / cols);
-
-      const maxWidth = Math.max(...imagePlanes.map((p) => p.width));
-
-      const maxHeight = Math.max(...imagePlanes.map((p) => p.height));
-
-      columnMaxWidth = maxWidth;
-
-      const stepX = maxWidth + CONFIG.GRID_GAP_X;
-
-      const stepY = maxHeight + CONFIG.GRID_GAP_Y;
-
-      imageStepY = stepY;
-
-      const totalWidth = (cols - 1) * stepX;
-
-      const totalHeight = (rows - 1) * stepY;
-
-      columnTotalHeight = totalHeight + maxHeight;
-
-      imagePlanes.forEach((item, index) => {
-        const col = index % cols;
-
-        const row = Math.floor(index / cols);
-
-        const x = col * stepX - totalWidth / 2;
-
-        const y = -(row * stepY - totalHeight / 2);
-
-        item.baseY = y;
-
-        if (index === 0) {
-          firstImageBaseY = y;
-        }
-
-        item.mesh.position.set(x, y, 0);
-        item.material.uniforms.uPlaneOffset.value.set(x, y);
+    
+      const x = 0;
+      let currentY = 0;
+    
+      columnMaxWidth = 0;
+    
+      imagePlanes.forEach((item) => {
+        columnMaxWidth = Math.max(columnMaxWidth, item.width);
       });
+    
+      imagePlanes[0].baseY = 0;
+    
+      imagePlanes[0].mesh.position.set(x, 0, 0);
+      imagePlanes[0].material.uniforms.uPlaneOffset.value.set(x, 0);
+    
+      firstImageBaseY = 0;
+    
+      currentY = 0;
+    
+      for (let i = 1; i < imagePlanes.length; i++) {
+        const previous = imagePlanes[i - 1];
+        const current = imagePlanes[i];
+    
+        currentY -=
+          previous.height * 0.5 +
+          current.height * 0.5 +
+          CONFIG.GRID_GAP_Y;
+    
+        current.baseY = currentY;
+    
+        current.mesh.position.set(x, currentY, 0);
+        current.material.uniforms.uPlaneOffset.value.set(x, currentY);
+      }
+    
+      lastImageBaseY = imagePlanes[imagePlanes.length - 1].baseY;
+    
+      columnTotalHeight =
+        Math.abs(lastImageBaseY - firstImageBaseY) +
+        imagePlanes[0].height * 0.5 +
+        imagePlanes[imagePlanes.length - 1].height * 0.5;
+    
+      imageStepY =
+        imagePlanes.length > 1
+          ? Math.abs(lastImageBaseY - imagePlanes[imagePlanes.length - 2].baseY)
+          : imagePlanes[0].height;
     }
 
     function loadTexture(url) {
@@ -1120,7 +1073,10 @@ console.log("Vis 6 - TUE 23rd JUN v1");
 
       scene.add(outerGroup);
 
-      const urls = CONFIG.IMAGE_URLS.slice(0, CONFIG.SECTION_COUNT);
+      const urls =
+        CONFIG.SECTION_COUNT > 0
+          ? CONFIG.IMAGE_URLS.slice(0, CONFIG.SECTION_COUNT)
+          : CONFIG.IMAGE_URLS;
 
       const textures = await Promise.all(urls.map(loadTexture));
 
@@ -1202,35 +1158,52 @@ console.log("Vis 6 - TUE 23rd JUN v1");
 
       const tiPx = viewportHeight * (TRANSITION.TI / 100);
       const toPx = viewportHeight * (TRANSITION.TO / 100);
-
+      
+      const msPx = Math.max(sectionHeight - tiPx, 1);
+      
       lastViewportHeight = viewportHeight;
-
+      
       tiProgress = clamp01(localY / Math.max(tiPx, 1));
-      toProgress = clamp01((localY - sectionHeight) / Math.max(toPx, 1));
+      
+      msProgress = clamp01(
+        (localY - tiPx) / msPx
+      );
+      
+      toProgress = clamp01(
+        (localY - sectionHeight) / Math.max(toPx, 1)
+      );
     }
 
     function applyTimeline() {
 
-      const scrollIndex = localY / Math.max(lastViewportHeight, 1);
-
-      const firstCenterIndex = CONFIG.FIRST_IMAGE_CENTER_VH / 100;
-
-      const stepIndex = CONFIG.IMAGE_STEP_VH / 100;
-
-      const imageIndexFloat =
-        (scrollIndex - firstCenterIndex) / Math.max(stepIndex, 0.0001);
-
-      const baseColumnOffsetY =
+          const firstOffset =
         -firstImageBaseY +
-        imageIndexFloat * imageStepY +
         CONFIG.COLUMN_Y_OFFSET;
-
-      const toSpeedT = Math.pow(toProgress, CONFIG.TO_SCROLL_EASE_POWER);
-
+      
+      const lastOffset =
+        -lastImageBaseY +
+        CONFIG.COLUMN_Y_OFFSET;
+      
+      const msOffset =
+        firstOffset +
+        (lastOffset - firstOffset) *
+        msProgress;
+      
+      const toSpeedT =
+        Math.pow(
+          toProgress,
+          CONFIG.TO_SCROLL_EASE_POWER
+        );
+      
       const toExtraScroll =
-        toProgress * imageStepY * CONFIG.TO_SCROLL_SPEED_MULTIPLIER * toSpeedT;
-
-      columnOffsetY = baseColumnOffsetY + toExtraScroll;
+        toProgress *
+        imageStepY *
+        CONFIG.TO_SCROLL_SPEED_MULTIPLIER *
+        toSpeedT;
+      
+      columnOffsetY =
+        msOffset +
+        toExtraScroll;
     }
 
     function updateRotation() {
