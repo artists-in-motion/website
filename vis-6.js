@@ -1,4 +1,4 @@
-console.log("Vis 6 - WED 5th AUG v3");
+console.log("Vis 6 - WED 5th AUG v4");
 (function startWhenAIMReady() {
   if (!window.AIM) {
     window.addEventListener("aimGlobalReady", startWhenAIMReady, {
@@ -89,7 +89,7 @@ console.log("Vis 6 - WED 5th AUG v3");
 
   // === FLOAT CUBE BACK LAYER ===
   FLOAT_BACK_ENABLED: true, // Turns rear cube layer on/off.
-  FLOAT_BACK_COUNT: 900, // Number of rear cubes.
+  FLOAT_BACK_COUNT: 500, // Number of rear cubes.
   FLOAT_BACK_SPREAD_X_MULTIPLIER: 3.55, // Rear layer width relative to image width.
   FLOAT_BACK_SPREAD_Y_MULTIPLIER: 1.22, // Rear layer height relative to image stack.
   FLOAT_BACK_EXTRA_HEIGHT: 2.0, // Extra vertical height for rear layer.
@@ -103,7 +103,7 @@ console.log("Vis 6 - WED 5th AUG v3");
 
   // === FLOAT CUBE FRONT LAYER ===
   FLOAT_FRONT_ENABLED: true, // Turns front cube layer on/off.
-  FLOAT_FRONT_COUNT: 100, // Number of front cubes.
+  FLOAT_FRONT_COUNT: 50, // Number of front cubes.
   FLOAT_FRONT_SPREAD_X_MULTIPLIER: 5.0, // Front layer width relative to image width.
   FLOAT_FRONT_SPREAD_Y_MULTIPLIER: 1.05, // Front layer height relative to image stack.
   FLOAT_FRONT_EXTRA_HEIGHT: 1.2, // Extra vertical height for front layer.
