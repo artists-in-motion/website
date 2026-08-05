@@ -1,4 +1,4 @@
-console.log("Vis 4 - WED 5th AUG v2");
+console.log("Vis 4 - WED 5th AUG v3");
 (function startWhenAIMReady() {
     if (!window.AIM) {
       window.addEventListener('aimGlobalReady', startWhenAIMReady, {
@@ -1685,16 +1685,24 @@ function updateTransitionProgress(progress = {}) {
       scene.add(light1, light2);
 
       try {
-        await loadTextures();
-
-        buildCubelets();
-        buildFloatingCubes();
-
-        isBuilt = true;
-        applyCurrentStateAfterLoad();
-      } catch (error) {
-        console.error("Vis 4 globe texture load failed:", error);
-      }
+          await loadTextures();
+        
+          buildCubelets();
+          buildFloatingCubes();
+        
+          isBuilt = true;
+          applyCurrentStateAfterLoad();
+        
+          window.AIM_VIS4_READY = true;
+        
+          window.dispatchEvent(
+            new CustomEvent("aimVisualReady", {
+              detail: { id: "vis-4" }
+            })
+          );
+        } catch (error) {
+          console.error("Vis 4 globe texture load failed:", error);
+        }
     },
 
     enter(app, progress = {}) {
