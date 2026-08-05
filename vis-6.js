@@ -1,4 +1,4 @@
-console.log("Vis 6 - WED 5th AUG v1");
+console.log("Vis 6 - WED 5th AUG v2");
 (function startWhenAIMReady() {
   if (!window.AIM) {
     window.addEventListener("aimGlobalReady", startWhenAIMReady, {
@@ -1201,9 +1201,14 @@ console.log("Vis 6 - WED 5th AUG v1");
         CONFIG.TO_SCROLL_SPEED_MULTIPLIER *
         toSpeedT;
       
-      columnOffsetY =
-        msOffset +
-        toExtraScroll;
+      const tiOffset =
+      (1 - tiProgress) *
+      (CONFIG.BUILD_ZONE_START_Y - CONFIG.BUILD_ZONE_END_Y);
+    
+    columnOffsetY =
+      msOffset +
+      tiOffset +
+      toExtraScroll;
     }
 
     function updateRotation() {
