@@ -116,6 +116,8 @@ console.log("Vis 4 - WED 5th AUG v1");
   METALNESS: 0.06 // Surface metalness.
 };
 
+CONFIG = app.getVisualConfig?.('vis-4', CONFIG) || CONFIG;
+
 const TRANSITION = {
   // === TIMELINE ===
   TI: 100, // Transition In length.
